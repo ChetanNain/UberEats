@@ -1,0 +1,9 @@
+{
+    "DB":{
+        "host" : "dbubereats.cmigyggrwvhm.us-east-2.rds.amazonaws.com",
+        "username" : "admin",
+        "password" : "password",
+        "port" : "3306",
+        "database" : "UberEats"
+    }
+}
