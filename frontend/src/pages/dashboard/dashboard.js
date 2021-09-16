@@ -1,9 +1,24 @@
 import Button from '../../components/Button';
-export default function Dashboard() {
+import React , { Component}  from 'react';
+import ReactDOM from 'react-dom';
+import PrimarySearchAppBar from '../../components/NavBar';
+import PersistentDrawerLeft from '../../components/drawer';
+
+ function Dashboard() {
+ 
+    const [open, setOpen] = React.useState(false);
+    function openDrawer() {
+        setOpen(true)
+    }
+
+    function closeDrawer(){
+        setOpen(false)
+    }
     return (
         <div>
-            <h1>Dashboard screen</h1>
-            <Button>Check out</Button>
+            <PrimarySearchAppBar handleDrawerOpen={openDrawer}/>
+            <PersistentDrawerLeft open={open} close={closeDrawer}/>
         </div>
     )
-} 
+}
+export default Dashboard;

@@ -43,15 +43,14 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function ButtonAppBar() {
+export default function ButtonAppBar(props) {
   const classes = useStyles();
-
   return (
     <div className={classes.root}>
       <AppBar  style={{background: 'white'}} position="static">
         <Toolbar>
           <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu" style={{color:'black'}}>
-            <MenuIcon />
+            <MenuIcon onClick={props.handleDrawerOpen}/>
           </IconButton>
           <h5 className={classes.title} style={{color: 'black', fontSize:'30px', margin:'0px' }}>Uber</h5>
           <h5 className={classes.title} style={{color: '#06c167', fontSize:'30px', margin:'0px' }}>Eats</h5>
