@@ -16,10 +16,20 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import InboxIcon from '@material-ui/icons/MoveToInbox';
+import HomeIcon from '@mui/icons-material/Home';
+import HomeWorkIcon from '@mui/icons-material/HomeWork';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import PersonIcon from '@mui/icons-material/Person';
+import EventNoteIcon from '@mui/icons-material/EventNote';
+import RestaurantIcon from '@mui/icons-material/Restaurant';
 import MailIcon from '@material-ui/icons/Mail';
 import Home from '../pages/home/home';
 import Profile from '../pages/profile/profile'
 import Register from '../pages/Register/Register'
+import ReceiptIcon from '@mui/icons-material/Receipt';
+import CustomerOrders from '../pages/CustomerOrders/CustomerOrders'
+import RestaurantHome from '../pages/RestaurantHome/RestaurantHome';
+import RestaurantOrders from '../pages/RestaurantOrders/RestaurantOrders';
 const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
@@ -84,8 +94,14 @@ export default function PersistentDrawerLeft(props) {
   const theme = useTheme();
   const [currentTab, setCurrentTab] = React.useState(<Home/>)
 
-  const drawerList = [{name: "Home", icon: <InboxIcon />}, {name: "Profile", icon: <InboxIcon />},
-{name:"Register", icon:<InboxIcon/>}];
+  const drawerList = 
+  [{name: "Home", icon: <HomeIcon />}, 
+    {name: "Profile", icon: <PersonIcon />},
+    {name:"Register", icon:<EventNoteIcon/>},
+    {name:"Add your restaurant", icon:<RestaurantIcon/> },
+    {name:"Restaurant Orders", icon: <ReceiptIcon/>},
+    {name:"Restaurant Homepage", icon:<HomeWorkIcon/>}
+];
     
 function selectedTab(tabName){
     if(tabName == 'Home'){
@@ -93,8 +109,20 @@ function selectedTab(tabName){
     }else if(tabName == 'Profile'){
         setCurrentTab(<Profile/>)
     }else if(tabName=='Register'){
-      setCurrentTab(<Register/>)
+      setCurrentTab(<Register validateRegister={validateRegister}/>)
+    } else if(tabName=='Restaurant Homepage'){
+      setCurrentTab(<RestaurantHome/>)
+    }else if(tabName=='Restaurant Orders'){
+      setCurrentTab(<RestaurantOrders/>)
     }
+}
+
+function validateRegister(flag){
+  if(flag){
+    setCurrentTab(<Home/>)
+  }else{
+    setCurrentTab(<Register validateRegister={validateRegister}/>)
+  }
 }
 
   return (

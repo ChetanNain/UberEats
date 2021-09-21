@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { alpha } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
@@ -7,6 +7,9 @@ import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import InputBase from '@material-ui/core/InputBase';
+import CustomizedDialog from './Dialog';
+import CustomerOrders from '../pages/CustomerOrders/CustomerOrders';
+import axios from 'axios';
 //import SearchIcon from '@material-ui/icons/Search';
 // import NavigationIcon from '@material-ui/icons/Navigation';
 // import Fab from '@material-ui/core/Fab';
@@ -43,8 +46,61 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+
 export default function ButtonAppBar(props) {
   const classes = useStyles();
+  const [openCartVal, setOpenCart] = useState(false);
+  
+  
+  const [cartData, setCartData] = useState([]);
+
+
+  useEffect(() => {
+    axios.get('http://localhost:3001/cart').then(res=>{
+      console.log("hello", res)
+          setCartData(res.data);
+      })
+        
+    /* [{
+      id: '1',
+      name: 'Burger',
+      price: 5.00,
+      quantity: 2 
+     },
+     {
+     id: '2',
+     name: 'Pizza',
+     price: 6.00,
+     quantity: 1 
+    },
+    {  id: '3',
+    name: 'Pasta',
+    price: 3.00,
+    quantity: 1  
+   }] */
+  }, [])
+
+  function openCart(){
+    setOpenCart(true);
+  }
+  function closeCart(){
+    setOpenCart(false);
+  }
+
+  function removeItem(id){
+    let arr = [...cartData];
+    const index = arr.findIndex(ele=>{
+      return id === ele.id
+    })
+    arr.splice(index, 1);
+     setCartData(arr);
+     if(arr.length == 0){
+        closeCart()
+     }
+     //call backedn API to remove this item from cart
+  }
+
+
   return (
     <div className={classes.root}>
       <AppBar  style={{background: 'white'}} position="static">
@@ -66,10 +122,13 @@ export default function ButtonAppBar(props) {
               inputProps={{ 'aria-label': 'search' }}
               style={{position:'absolute', right:'50%'}}
             />
-            <Button variant="extended" style={{background: 'black', color:'white', position:'absolute', right:'10%'}}> Cart</Button>
+            <Button variant="extended" style={{background: 'black', color:'white', position:'absolute', right:'10%'} } onClick={openCart}> Cart</Button>
             <Button variant="extended" style={{background: 'grey', color:'black', position:'absolute', right:'2%'}}> Sign in</Button>
         </Toolbar>
       </AppBar>
+      <CustomizedDialog open={openCartVal} closeCart={closeCart}>{cartData.map(cartItem =>{
+        return <CustomerOrders cartItem = {cartItem} removeItem={removeItem}/>
+      })} </CustomizedDialog>
     </div>
   );
 }

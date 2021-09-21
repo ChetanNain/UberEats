@@ -3,6 +3,7 @@ const express = require('express');
 const constants = require("./config.json");
 const bodyparser = require('body-parser');
 const e = require('express');
+const cors = require('cors')
 
 var app = express();
 app.use(express.json());
@@ -24,11 +25,14 @@ connection.getConnection((err) =>{
     console.log("Connection Created");
 });
 
+app.use(cors())
+
 //Get all restaurants
 app.get('/restaurants', function (req, res) {
     connection.query('SELECT * FROM UberEats.Restaurants;', (err, rows, fields)=>{
         if(!err){
             console.log(rows);
+            res.send(rows);
         }else{
             console.log(err);
         }
@@ -71,12 +75,21 @@ app.post('/restaurants/addDishes',(req,res,next)=>{
     })
 })
 
-//Dishes by restaurant
-app.get('/dishes/:restaurantID', function (req, res) {
-    let data = [req.params.restaurantID];
-    connection.query('SELECT * FROM UberEats.Dishes where restaurantID = ?',data, (err, rows, fields)=>{
+app.get('/dishes/:dishTag', function (req, res) {
+    connection.query(`Select dish.dishID as id,dish.dishImage,res.id as restaurantId  , dish.dishName, dish.dishPrice as price, dish.dishTag as dishTag ,res.name from Restaurants as res Inner Join Dishes  as dish ON res.id=dish.restaurantId where dishTag = '${req.params.dishTag}'`, 
+    (err, rows, fields)=>{
         if(!err){
-            console.log(rows);
+            res.send(rows);
+        }else{
+            console.log(err);
+        }
+    })
+});
+//Dishes by restaurant
+app.get('/dishes/restaurant/:restaurantId', function (req, res) {
+    connection.query(`Select dish.dishID as id,dish.dishImage,res.id as restaurantId  , dish.dishName, dish.dishPrice as price, dish.dishTag as dishTag ,res.name from Restaurants as res Inner Join Dishes  as dish ON res.id=dish.restaurantId where dish.restaurantId = '${req.params.restaurantId}'`, (err, rows, fields)=>{
+        if(!err){
+            res.send(rows)
         }else{
             console.log(err);
         }
@@ -110,6 +123,27 @@ app.put('/customers/:customerID/:phoneNumber', (req,res,next)=>{
         !err? res.json(results): res.json(err);
     })
 })
+
+
+
+app.get('/cart', function(req,res){
+    connection.query('select dish.dishID as id,dish.dishImage,res.id as restaurantId , dish.dishName, dish.dishPrice as price from cart, Restaurants as res, Dishes as dish where cart.dishId = dish.dishId and cart.restaurantId = res.id;',
+    (err, rows, fields)=>{
+        if(!err){
+            res.send(rows);
+        }else{
+            console.log(err);
+        }
+    })
+});
+
+app.post('/addToCart', (req, res) =>{
+    
+    req.body.restaurentId,
+    req.body.userId,
+    req.body.itemId
+})
+
 app.listen(3001, function () {
-    console.log("Server listening on port 3000");
+    console.log("Server listening on port 3001");
 });

@@ -1,0 +1,45 @@
+#ProfilePage{
+    text-align: center;
+  }
+label {
+    color: #000;
+    display: block;
+    width: 150px;
+    font-size: 20px;
+}
+
+input{
+    width: 35%;
+    height: 40px;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+#buttonLogout {
+    background-color: #E5E5E5;
+    border: none;
+    color: #E56B37;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    width: 180px;
+
+  }
+#buttonSaveChanges{
+    background-color: #276EF1;
+    border: none;
+    color: #FFEBFA;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    width: 180px;
+}
