@@ -138,10 +138,27 @@ app.get('/cart', function(req,res){
 });
 
 app.post('/addToCart', (req, res) =>{
+    const itemId = req.body.itemId;
+    const customerId =req.body.customerId;
+    connection.query(`select dish.dishID as id,dish.dishImage,res.id as restaurantId , dish.dishName, dish.dishPrice as price from cart, Restaurants as res, Dishes as dish where cart.dishId = dish.dishId and cart.restaurantId = res.id and dish.dishId = ${itemId};`,
+    (err, rows, fields)=>{
+        restaurantId = rows[0].restaurantId;
+        itemPrice = rows[0].price;
+        totalPrice = itemPrice * 1;
+
+        quantity=1
+
+        connection.query('INSERT INTO cart VALUES(?,?,?,?,?,?, ?)', [customerId,itemId, restaurantId, quantity, itemPrice, totalPrice, 0],
+            (err, data, fields)=>{
+                if(!err){
+                    res.send(data);
+                }else{
+                    console.log(err);
+                }
+            })
+
+    });
     
-    req.body.restaurentId,
-    req.body.userId,
-    req.body.itemId
 })
 
 app.listen(3001, function () {

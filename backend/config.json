@@ -1,6 +1,6 @@
 {
     "DB":{
-        "host" : "dbubereats.cmigyggrwvhm.us-east-2.rds.amazonaws.com",
+        "host" : "ubereatsdb.cmigyggrwvhm.us-east-2.rds.amazonaws.com",
         "username" : "admin",
         "password" : "password",
         "port" : "3306",
