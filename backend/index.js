@@ -161,6 +161,39 @@ app.post('/addToCart', (req, res) =>{
     
 })
 
+
+app.post('/removeFromCart', (req, res) =>{
+    const itemId = req.body.itemId;
+    console.log(itemId);
+    connection.query(`DELETE FROM cart WHERE dishId= ${itemId};`,
+    (err, rows, fields)=>{
+        if(!err){
+            res.send(200);
+        }else{
+            console.log("Error in delete");
+            console.log(err);
+        }
+    });
+    
+})
+
+app.get('/getRestaurantOrders', (req, res) =>{
+    const itemId = req.body.itemId;
+    console.log(itemId);
+    connection.query(`DELETE FROM cart WHERE dishId= ${itemId};`,
+    (err, rows, fields)=>{
+        if(!err){
+            res.send(200);
+        }else{
+            console.log("Error in delete");
+            console.log(err);
+        }
+    });
+    
+})
+
+
+
 app.listen(3001, function () {
     console.log("Server listening on port 3001");
 });

@@ -86,17 +86,34 @@ export default function ButtonAppBar(props) {
   function closeCart(){
     setOpenCart(false);
   }
-
+//   var addToCart =()=>{
+//     const data = {itemId: props.item.id, customerId: 1}
+//     axios.post("http://localhost:3001/addToCart", data)
+//     .then(
+//         res => {
+//             alert("Item added to cart.");
+//         }
+//     )
+// }
   function removeItem(id){
-    let arr = [...cartData];
-    const index = arr.findIndex(ele=>{
-      return id === ele.id
-    })
-    arr.splice(index, 1);
-     setCartData(arr);
+    const data  = {itemId:id}
+    axios.post("http://localhost:3001/removeFromCart", data)
+    .then(
+      res => {
+        //setCartData(res.data);
+        let arr = [...cartData];
+        const index = arr.findIndex(ele=>{
+          return id === ele.id
+        })
+        arr.splice(index, 1);
+        setCartData(arr);
      if(arr.length == 0){
         closeCart()
-     }
+      }
+      }
+      
+    )
+     
      //call backedn API to remove this item from cart
   }
 
