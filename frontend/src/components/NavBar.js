@@ -140,7 +140,7 @@ export default function ButtonAppBar(props) {
               style={{position:'absolute', right:'50%'}}
             />
             <Button variant="extended" style={{background: 'black', color:'white', position:'absolute', right:'10%'} } onClick={openCart}> Cart</Button>
-            <Button variant="extended" style={{background: 'grey', color:'black', position:'absolute', right:'2%'}}> Sign in</Button>
+            <Button variant="extended" style={{background: 'grey', color:'black', position:'absolute', right:'2%'}} > Sign in</Button>
         </Toolbar>
       </AppBar>
       <CustomizedDialog open={openCartVal} closeCart={closeCart}>{cartData.map(cartItem =>{

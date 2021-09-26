@@ -126,16 +126,7 @@ app.put('/customers/:customerID/:phoneNumber', (req,res,next)=>{
 
 
 
-app.get('/cart', function(req,res){
-    connection.query('select dish.dishID as id,dish.dishImage,res.id as restaurantId , dish.dishName, dish.dishPrice as price from cart, Restaurants as res, Dishes as dish where cart.dishId = dish.dishId and cart.restaurantId = res.id;',
-    (err, rows, fields)=>{
-        if(!err){
-            res.send(rows);
-        }else{
-            console.log(err);
-        }
-    })
-});
+
 
 app.post('/addToCart', (req, res) =>{
     const itemId = req.body.itemId;
@@ -177,7 +168,35 @@ app.post('/removeFromCart', (req, res) =>{
     
 })
 
-app.get('/getRestaurantOrders', (req, res) =>{
+app.get('/cart', function(req,res){
+    connection.query('select dish.dishID as id,dish.dishImage,res.id as restaurantId , dish.dishName, dish.dishPrice as price from cart, Restaurants as res, Dishes as dish where cart.dishId = dish.dishId and cart.restaurantId = res.id;',
+    (err, rows, fields)=>{
+        if(!err){
+            res.send(rows);
+        }else{
+            console.log(err);
+        }
+    })
+});
+
+
+
+
+app.get('/getRestaurantOrders/:id', (req, res) =>{
+    console.log("called restaurantOrders");
+   // console.log(req.params.id);
+    connection.query(`SELECT * FROM Orders where restaurantID=` + req.params.id,
+    (err, rows, fields)=>{
+        if(!err){
+            res.send(rows);
+        }else{
+            console.log("Error in delete");
+            console.log(err);
+        }
+    });
+})
+
+app.post('/removeFromCart', (req, res) =>{
     const itemId = req.body.itemId;
     console.log(itemId);
     connection.query(`DELETE FROM cart WHERE dishId= ${itemId};`,
@@ -186,6 +205,22 @@ app.get('/getRestaurantOrders', (req, res) =>{
             res.send(200);
         }else{
             console.log("Error in delete");
+            console.log(err);
+        }
+    });
+    
+})
+
+
+app.post('/updateOrderStatus',(req,res)=>{
+    const orderStatus = req.body.orderStatus;
+    const orderID = req.body.orderID;
+    console.log(orderStatus, orderID);
+    connection.query(`UPDATE Orders SET orderStatus=${orderStatus} where orderID=${orderID}`,
+    (err,rows,fields)=>{
+        if(!err){
+            res.send(200);
+        }else{
             console.log(err);
         }
     });

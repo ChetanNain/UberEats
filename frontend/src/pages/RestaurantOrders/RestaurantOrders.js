@@ -1,52 +1,34 @@
 import React from "react"
 import axios from "axios"
 export default function RestaurantOrders() {
-    function  UpdateOrderStatus (id, e) {
-        alert(id);
-        alert(e.target.value);
+    async function  UpdateOrderStatus (id, e) {
+            const data = {
+                            orderStatus : e.target.value , 
+                            orderID : id
+                        }
+            await axios.post('http://localhost:3001/updateOrderStatus',data)
+            alert(id);
     }
-    const [orders, setOrders] = React.useState();
-
-//     const data = [{
-//             OrderID: 1,
-//             CustomerID: 1,
-//             dishName: "Burger",
-//             dishStatus: 1,
-//     },
-//     {
-//         OrderID: 1,
-//         CustomerID: 1,
-//         dishName: "Burger",
-//         dishStatus: 1,
-//     }
-// ]
-
+    const [orders, setOrders] = React.useState([]);
     React.useEffect(() => {
-        axios.get("http://localhost:3001/getRestaurantOrders", {
-            params:{
-                restaurantID: 1
-            }
-        })
-        .then(
-            res => {
-                setOrders(res.data);
-            }
-        )
+        console.log("use effect");
+        axios.get('http://localhost:3001/getRestaurantOrders/1').then(res => {
+        setOrders(res.data);
     })
-
+  }, [])
 
     return <div >
             {orders.map(order => {
                 return <div style={{borderBottom: '1px solid black'}}>
                         <div style={{justifyContent: 'space-between', display: 'flex', alignItems: 'center' }}>
-                            <span>{order.OrderID}</span> 
-                            <span>{order.CustomerID}</span>
+                            <span>{order.orderID}</span> 
+                            <span>{order.customerID}</span>
                             <span>{order.dishName}</span>
-                            <span>{order.dishStatus == 1 ? "Received" : "Inprogress" }</span>
-                            <select onChange={(event)=>UpdateOrderStatus(order.OrderID, event)}>
-                                <option>Received</option>
-                                <option>Cooking in progress</option>
-                                <option>Delivered</option>
+                            <span>{order.orderStatus == 1 ? "Received" : order.orderStatus==2 ? "Preparing Now" : "Delivered" }</span>
+                            <select onChange={(event)=>UpdateOrderStatus(order.orderID, event)}>
+                                <option value="1">Received</option>
+                                <option value="2">Preparing Now</option>
+                                <option value="3">Delivered</option>
                             </select>
                         </div><br/>
                     </div>
