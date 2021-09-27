@@ -14,6 +14,7 @@ import PersistentDrawerLeft from '../../components/drawer';
     function closeDrawer(){
         setOpen(false)
     }
+    
     return (
         <div>
             <PrimarySearchAppBar handleDrawerOpen={openDrawer}/>

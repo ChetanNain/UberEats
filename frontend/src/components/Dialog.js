@@ -23,7 +23,9 @@ const BootstrapDialogTitle = (props) => {
   const { children, onClose, ...other } = props;
 
   return (
-    <DialogTitle sx={{ m: 0, p: 2 }} {...other}>
+
+    //sx={{ m: 0, p: 2 }} {...other}
+    <DialogTitle >
       {children}
       {onClose ? (
         <IconButton
@@ -49,7 +51,6 @@ BootstrapDialogTitle.propTypes = {
 };
 
 export default function CustomizedDialogs(props) {
-   
   const handleClose = () => {
     props.closeCart();
   }; 
@@ -59,15 +60,14 @@ export default function CustomizedDialogs(props) {
       <BootstrapDialog
         onClose={handleClose}
         aria-labelledby="customized-dialog-title"
-        open={props.open}
-      >
+        open={props.open}>
         <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
-          Modal title
+          Your Cart
         </BootstrapDialogTitle>
             {props.children}
         <DialogActions>
-          <Button autoFocus onClick={handleClose}>
-            Save changes
+          <Button autoFocus onClick={handleClose} class="btn-primary w-100" >
+            Checkout
           </Button>
         </DialogActions>
       </BootstrapDialog>

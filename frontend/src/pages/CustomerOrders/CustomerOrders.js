@@ -15,17 +15,17 @@ export default function CustomerOrders(props) {
                 <tr>
                     <td>
                         <div className="cart-info">
-                        <td><input type="number" value={props.cartItem.quantity}></input></td>
+                        <td><input type="number" value="1"></input></td>
                             <img src = {image1} style={{height: "75px"}}/>
                             <div>
-                                <p>{props.cartItem.name}</p>
+                                <p>{props.cartItem.dishName}</p>
                                 <small>Price: {props.cartItem.price}</small>
                                 <a onClick={()=>props.removeItem(props.cartItem.id)}>Remove</a>
                             </div>
                         </div>
                     </td>
                     
-                    <td>{props.cartItem.quantity * props.cartItem.price}</td>
+                    <td>{1 * props.cartItem.price}</td>
                 </tr>
             </table>
         </div>

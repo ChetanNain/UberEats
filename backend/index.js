@@ -4,6 +4,8 @@ const constants = require("./config.json");
 const bodyparser = require('body-parser');
 const e = require('express');
 const cors = require('cors')
+const { v4: uuidv4 } = require('uuid');
+
 
 var app = express();
 app.use(express.json());
@@ -50,14 +52,6 @@ app.get('/restaurants/:id',(req,res)=>{
     })
 })
 
-
-//Register restaurant Profile.
-app.post('/restaurants',(req,res,next)=>{
-    let data = [req.body.restaurantID, req.body.restaurantName, req.body.restaurantContact, req.body.restaurantImages, req.body.restaurantUsername, req.body.restaurantPassword, req.body.restaurantDescription, req.body.restaurantAddress];
-    connection.query ('INSERT INTO UberEats.Restaurants VALUES (?,?,?,?,?,?,?,?)', data, (err, results, fields)=>{
-        !err? res.json(results): res.json(err);
-    } )
-})
 
 //Update phone number.
 app.put('/restaurants/:restaurantID/:restaurantContact', (req,res,next)=>{
@@ -179,9 +173,6 @@ app.get('/cart', function(req,res){
     })
 });
 
-
-
-
 app.get('/getRestaurantOrders/:id', (req, res) =>{
     console.log("called restaurantOrders");
    // console.log(req.params.id);
@@ -228,6 +219,26 @@ app.post('/updateOrderStatus',(req,res)=>{
 })
 
 
+app.post('/addRestaurantBasicDetail', (req,res)=>{
+    const restID = uuidv4();
+    let data = [restID, req.body.name, req.body.country, req.body.provience,  req.body.pincode, null, req.body.description, req.body.restaurantUsername, req.body.restaurantPassword ]
+    connection.query ('INSERT INTO UberEats.Restaurants VALUES (?,?,?,?,?,?,?,?,?)', data, (err, results, fields)=>{
+        !err? res.json(restID): res.json(err);
+    } )
+})
+
+
+app.get('/basicDetail/:restaurantID',(req,res) => {
+    connection.query(`SELECT * FROM Restaurants where id='${req.params.restaurantID}'`,
+    (err, rows, fields)=>{
+        if(!err){
+            res.send(rows);
+        }else{
+            console.log("Error in delete");
+            console.log(err);
+        }
+    })
+});
 
 app.listen(3001, function () {
     console.log("Server listening on port 3001");

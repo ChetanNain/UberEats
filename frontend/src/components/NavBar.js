@@ -54,35 +54,17 @@ export default function ButtonAppBar(props) {
   
   const [cartData, setCartData] = useState([]);
 
-
   useEffect(() => {
     axios.get('http://localhost:3001/cart').then(res=>{
       console.log("hello", res)
           setCartData(res.data);
       })
-        
-    /* [{
-      id: '1',
-      name: 'Burger',
-      price: 5.00,
-      quantity: 2 
-     },
-     {
-     id: '2',
-     name: 'Pizza',
-     price: 6.00,
-     quantity: 1 
-    },
-    {  id: '3',
-    name: 'Pasta',
-    price: 3.00,
-    quantity: 1  
-   }] */
   }, [])
 
   function openCart(){
     setOpenCart(true);
   }
+  
   function closeCart(){
     setOpenCart(false);
   }

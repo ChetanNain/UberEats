@@ -30,6 +30,7 @@ import ReceiptIcon from '@mui/icons-material/Receipt';
 import CustomerOrders from '../pages/CustomerOrders/CustomerOrders'
 import RestaurantHome from '../pages/RestaurantHome/RestaurantHome';
 import RestaurantOrders from '../pages/RestaurantOrders/RestaurantOrders';
+import AddRestaurant from '../pages/AddRestaurant/AddRestaurant'
 const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
@@ -98,9 +99,9 @@ export default function PersistentDrawerLeft(props) {
   [{name: "Home", icon: <HomeIcon />}, 
     {name: "Profile", icon: <PersonIcon />},
     {name:"Register", icon:<EventNoteIcon/>},
-    {name:"Add your restaurant", icon:<RestaurantIcon/> },
     {name:"Restaurant Orders", icon: <ReceiptIcon/>},
-    {name:"Restaurant Homepage", icon:<HomeWorkIcon/>}
+    {name:"Restaurant Homepage", icon:<HomeWorkIcon/>},
+    {name: "Add Your Restaurant", icon: <RestaurantIcon/>}
 ];
     
 function selectedTab(tabName){
@@ -114,6 +115,8 @@ function selectedTab(tabName){
       setCurrentTab(<RestaurantHome/>)
     }else if(tabName=='Restaurant Orders'){
       setCurrentTab(<RestaurantOrders/>)
+    }else if(tabName=="Add Your Restaurant"){
+      setCurrentTab(<AddRestaurant/>)
     }
 }
 

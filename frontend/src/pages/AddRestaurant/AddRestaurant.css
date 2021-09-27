@@ -1,0 +1,36 @@
+input[type='number']{
+    margin: 12px 0px
+}
+
+textarea {
+    margin: 12px 0px !important
+}
+
+input[type='file']{
+    margin: 12px 0px;
+    border: none;
+}
+
+.menuForm {
+  border-bottom: 1px solid black;
+  padding: 20px;
+  border-radius: 15px;
+  background-color: #fff;
+  margin-top: 10px;
+}
+
+.error {
+  color: red;
+  margin: auto;
+}
+
+.mandatory {
+  font-size: 10px;
+  font-style: italic;
+}
+
+.link {
+  color: #800000 !important;
+  text-decoration: underline !important;
+  cursor: pointer;
+}
