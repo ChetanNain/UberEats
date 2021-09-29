@@ -10,7 +10,7 @@ import axios from 'axios';
 export default function RestaurantHome() {
   const [data, setData] = React.useState([])
   React.useEffect(() => {
-    axios.get('http://localhost:3001/dishes/restaurant/1').then(res => {
+    axios.get('http://localhost:3001/dishes/restaurant/'+localStorage.getItem("restaurantID")).then(res => {
       setData(res.data);
     })
   }, [])

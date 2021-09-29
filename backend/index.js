@@ -227,11 +227,31 @@ app.post('/addRestaurantBasicDetail', (req,res)=>{
     } )
 })
 
+app.post('/addRestaurantMenu', (req,res)=>{
+    let data = [ '',req.body.restaurantId, req.body.dishName, req.body.dishIngredients,'', req.body.dishPrice,req.body.dishDescription, req.body.dishCategory, req.body.mealType, req.body.dishType ]
+    connection.query ('INSERT INTO UberEats.Dishes VALUES (?,?,?,?,?,?,?,?,?,?)', data, (err, results, fields)=>{
+        !err? res.json(results): res.json(err);
+    } )
+})
+
 
 app.get('/basicDetail/:restaurantID',(req,res) => {
     connection.query(`SELECT * FROM Restaurants where id='${req.params.restaurantID}'`,
     (err, rows, fields)=>{
         if(!err){
+            res.send(rows);
+        }else{
+            console.log("Error in delete");
+            console.log(err);
+        }
+    })
+});
+
+app.get('/menuDetails/:restaurantID',(req,res) => {
+    connection.query(`SELECT * FROM Dishes where restaurantID='${req.params.restaurantID}'`,
+    (err, rows, fields)=>{
+        if(!err){
+            console.log("Reached menu");
             res.send(rows);
         }else{
             console.log("Error in delete");

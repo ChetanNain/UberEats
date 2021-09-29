@@ -62,14 +62,9 @@ export default function CustomizedDialogs(props) {
         aria-labelledby="customized-dialog-title"
         open={props.open}>
         <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
-          Your Cart
+         {props.title}
         </BootstrapDialogTitle>
             {props.children}
-        <DialogActions>
-          <Button autoFocus onClick={handleClose} class="btn-primary w-100" >
-            Checkout
-          </Button>
-        </DialogActions>
       </BootstrapDialog>
     </div>
   );

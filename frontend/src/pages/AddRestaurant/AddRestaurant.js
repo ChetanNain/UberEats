@@ -1,14 +1,13 @@
 import React, {Component} from 'react';
 import './AddRestaurant.css';
 import axios from 'axios';
+import CustomizedDialogs from '../../components/Dialog';
 
 export default class AddRestaurant extends Component {
     constructor(){
         super();
         this.state = {
             provienceForSelectedContry: this.countryAndProvince[0].states,
-            dishForm: [],
-            dishFormData: [],
             restaurantName: '',
             restaurantLocation: '',
             restaurantCountry: 'US',
@@ -16,7 +15,16 @@ export default class AddRestaurant extends Component {
             restaurantPincode: '',
             restaurantDescription: '',
             errorMessage: '',
-            menuItems: []
+            menuItems: [],
+            dishName: '',
+            dishPrice: '',
+            dishIngredients: '',
+            mealType: 'Brakfast',
+            dishCategory: 'Todays Offer',
+            dishType:'Veg',
+            open: false,
+            errorMessageOnMenu: '',
+            dishDescription:''
         }
         this.restaurantNameHandler = this.restaurantNameHandler.bind(this);
         this.restaurantLocationHandler = this.restaurantLocationHandler.bind(this);
@@ -24,20 +32,35 @@ export default class AddRestaurant extends Component {
         this.handleProvinceChange = this.handleProvinceChange.bind(this);
         this.restaurantPincodeHandler = this.restaurantPincodeHandler.bind(this);
         this.restaurantDescriptionHandler = this.restaurantDescriptionHandler.bind(this);
-        this.generateNewDishForm = this.generateNewDishForm.bind(this);
-        this.removeDishForm = this.removeDishForm.bind(this);
         this.validateBasicFromDetail = this.validateBasicFromDetail.bind(this);
+        this.validateMenuForm = this.validateMenuForm.bind(this);
+        this.handleDishDescription = this.handleDishDescription.bind(this);
 
         this.handleDishName = this.handleDishName.bind(this);
         this.handleDishPrice = this.handleDishPrice.bind(this);
-        this.handleDisgIngredients = this.handleDisgIngredients.bind(this);
+        this.handleDishIngredients = this.handleDishIngredients.bind(this);
         this.handleMealType = this.handleMealType.bind(this);
         this.handleDishCategory = this.handleDishCategory.bind(this);
+
         this.handleDishType = this.handleDishType.bind(this);
         this.saveRestaurantData = this.saveRestaurantData.bind(this);
         this.loadBasicDetails = this.loadBasicDetails.bind(this);
         this.loadMenuItems = this.loadMenuItems.bind(this);
         this.removeExstingMenuItem = this.removeExstingMenuItem.bind(this);
+        this.openModal = this.openModal.bind(this);
+        this.closeModal = this.closeModal.bind(this);
+        this.saveMenu = this.saveMenu.bind(this);
+    }
+
+    openModal(){
+        if(!localStorage.getItem("restaurantID")) {
+            alert("Save Basic details to proceed with menu");
+        }
+        this.setState({open: true})
+    }
+
+    closeModal(){
+        this.setState({open: false})
     }
 
     componentDidMount(){
@@ -51,36 +74,37 @@ export default class AddRestaurant extends Component {
     }
 
     async loadMenuItems(){
-        //const menuItems = await axios.get('http://localhost:3001/basicDetail/1');
-        const menuItems = [{
-            id: 1,
-            dishName: 'Burger',
-            dishPrice: '2.40',
-            dishIngredients: 'Black Paper, salt',
-            mealType: 'Breakfast',
-            dishCategory: 'Todays offer',
-            dishType: 'Veg'
-        },
-        {
-            id: 2,
-            dishName: 'Burger',
-            dishPrice: '2.40',
-            dishIngredients: 'Black Paper, salt',
-            mealType: 'Breakfast',
-            dishCategory: 'Todays offer',
-            dishType: 'Veg'
-        },
-        {
-            id: 3,
-            dishName: 'Burger',
-            dishPrice: '2.40',
-            dishIngredients: 'Black Paper, salt',
-            mealType: 'Breakfast',
-            dishCategory: 'Todays offer',
-            dishType: 'Veg'
-        }
-    ];
-        this.setState({menuItems: menuItems});
+     //  const res = await axios.get('http://localhost:3001/basicDetail/' + localStorage.getItem("restaurantID"));
+        const menuItems = await axios.get('http://localhost:3001/menuDetails/'+localStorage.getItem("restaurantID"));
+    //     const menuItems = [{
+    //         id: 1,
+    //         dishName: 'Burger',
+    //         dishPrice: '2.40',
+    //         dishIngredients: 'Black Paper, salt',
+    //         mealType: 'Breakfast',
+    //         dishCategory: 'Todays offer',
+    //         dishType: 'Veg'
+    //     },
+    //     {
+    //         id: 2,
+    //         dishName: 'Burger',
+    //         dishPrice: '2.40',
+    //         dishIngredients: 'Black Paper, salt',
+    //         mealType: 'Breakfast',
+    //         dishCategory: 'Todays offer',
+    //         dishType: 'Veg'
+    //     },
+    //     {
+    //         id: 3,
+    //         dishName: 'Burger',
+    //         dishPrice: '2.40',
+    //         dishIngredients: 'Black Paper, salt',
+    //         mealType: 'Breakfast',
+    //         dishCategory: 'Todays offer',
+    //         dishType: 'Veg'
+    //     }
+    // ];
+        this.setState({menuItems: menuItems.data});
     }
 
     countryAndProvince = [
@@ -386,53 +410,39 @@ export default class AddRestaurant extends Component {
                 }
             ]
 
-    validateExistingMenu() {
-        let valid;
-        const dishFormData = [...this.state.dishFormData];
-        dishFormData.forEach(element => {
-            if(!element.dishName || !element.dishPrice || !element.dishCategory || !element.dishIngredients || !element.mealType || !element.dishType){
-                alert('Please fill all MENU details before proceeding to next.');
-                valid = false;
-            }
-        });
-        return valid;
+    validateMenuForm() {
+        if(this.state.dishName.length < 1){
+            this.setState({errorMessageOnMenu: 'Enter valid Dish name'})
+            return false;
+        }
+        return true;
     }
 
-    handleDishName(id, e) {
-        const dishFormData = [...this.state.dishFormData];
-        console.log(dishFormData)
-        dishFormData[id - 1].dishName = e.target.value
-        this.setState({dishFormData: dishFormData});
+    handleDishName(e) {
+        this.setState({dishName: e.target.value});
     }
 
-    handleDishPrice(id, e) {
-        const dishFormData = [...this.state.dishFormData];
-        dishFormData[id - 1].dishPrice = e.target.value
-        this.setState({dishFormData: dishFormData});
+    handleDishPrice(e) {
+        this.setState({dishPrice: e.target.value});
     }
 
-    handleDisgIngredients(id, e) {
-        const dishFormData = [...this.state.dishFormData];
-        dishFormData[id - 1].dishIngredients = e.target.value
-        this.setState({dishFormData: dishFormData});
+    handleDishIngredients(e) {
+        this.setState({dishIngredients: e.target.value});
     }
 
-    handleMealType(id, e) {
-        const dishFormData = [...this.state.dishFormData];
-        dishFormData[id - 1].mealType = e.target.value
-        this.setState({dishFormData: dishFormData});
+    handleMealType(e) {
+        this.setState({mealType: e.target.value});
     }
 
-    handleDishCategory(id, e) {
-        const dishFormData = [...this.state.dishFormData];
-        dishFormData[id - 1].dishCategory = e.target.value
-        this.setState({dishFormData: dishFormData});
+    handleDishCategory(e) {
+        this.setState({dishCategory: e.target.value});
     }
 
-    handleDishType(id, e) {
-        const dishFormData = [...this.state.dishFormData];
-        dishFormData[id - 1].dishType = e.target.value
-        this.setState({dishFormData: dishFormData});
+    handleDishType(e) {
+        this.setState({dishType: e.target.value});
+    }
+    handleDishDescription(e){
+        this.setState({dishDescription : e.target.value});
     }
 
     
@@ -451,64 +461,13 @@ export default class AddRestaurant extends Component {
         <div style={{justifyContent: 'space-between', display: 'flex', alignItems: 'center' }}>
             <span>{data.dishName}</span> 
             <span>{data.dishPrice}</span>
-            <span>{data.dishIngredients}</span>
-            <span>{data.mealType}</span>
+            <span>{data.mainIngredients}</span>
+            <span>{data.dishTag}</span>
             <span>{data.dishType}</span>
             <span>{data.dishCategory}</span>
             <a class="link" onClick={()=>this.removeExstingMenuItem(data.id)}>Remove</a>
         </div>
     </div>
-    }
-
-    generateNewDishForm(){
-       if(this.validateBasicFromDetail() == false || this.validateExistingMenu() == false) return;
-        const element = <div class='menuForm'>
-             <span class='mandatory'>* All Fields are mandatory</span>
-        <div >
-            <input type='text' placeholder='Dish name' onChange={(event)=>this.handleDishName(this.state.dishForm.length, event)}/>
-            <input type='number' placeholder='Dish Price' onChange={(event)=>this.handleDishPrice(this.state.dishForm.length, event)}/>
-            <input type='text' placeholder='Ingredients (Use comma to seperate)' onChange={(event)=>this.handleDisgIngredients(this.state.dishForm.length, event)}/>
-            <input type="file" id="img" name="img" accept="image/*"></input>
-        </div>
-
-        <div >
-                <select onChange={(event)=>this.handleMealType(this.state.dishForm.length, event)}>
-                    <option value="Breakfast">Breakfast</option>
-                    <option value="Lunch">Lunch</option>
-                    <option value="Snacks">Snacks</option>
-                    <option value="Dinner">Dinner</option>
-                </select>
-
-                <select onChange={(event)=>this.handleDishCategory(this.state.dishForm.length, event)}>
-                    <option value="Todays Offer">Todays Offer</option>
-                    <option value="Trending Now">Trending Now</option>
-                    <option value="Healthy Eating">Healthy Eating</option>
-                    <option value="Easy on Pocket">Easy on Pocket</option>
-                </select>
-
-                <select onChange={(event)=>this.handleDishType(this.state.dishForm.length, event)}>
-                    <option value="Veg">Veg</option>
-                    <option value="Nonveg">NonVeg</option>
-                </select>
-        </div>
-        <div class="d-flex justify-content-end">
-            <button class="btn btn-danger mt-3" onClick={()=>this.removeDishForm(this.state.dishForm.length)}>Remove -</button>
-        </div>
-    </div>
-        const dishForm = [...this.state.dishForm];
-        dishForm.push(element);
-        this.setState({ dishForm : dishForm })
-
-        const dishFormData = [...this.state.dishFormData];
-        dishFormData.push({
-            dishName: '',
-            dishPrice: '',
-            dishIngredients: '',
-            mealType: 'Breakfast',
-            dishType: 'Veg',
-            dishCategory: 'Todays Offer'
-        })
-        this.setState({dishFormData})
     }
 
     removeDishForm(id){
@@ -517,6 +476,7 @@ export default class AddRestaurant extends Component {
         dishForm.splice(id - 1, 1);
         dishFormData.splice(id - 1, 1)
         this.setState({dishForm: dishForm, dishFormData: dishFormData})
+
     }
 
     handleCountryChange(e){
@@ -570,8 +530,32 @@ export default class AddRestaurant extends Component {
         }
     }
 
+
+    saveMenu(){
+        if(this.validateBasicFromDetail() == false || this.validateMenuForm() == false) return;
+        const body = {
+            dishName: this.state.dishName,
+            dishDescription: this.state.dishDescription,
+            dishPrice: this.state.dishPrice,
+            dishIngredients: this.state.dishIngredients,
+            mealType: this.state.mealType,
+            dishCategory: this.state.dishCategory,
+            dishType: this.state.dishType,
+            restaurantId: localStorage.getItem("restaurantID")
+        }
+         axios.post('http://localhost:3001/addRestaurantMenu', body).then(response=>{ 
+            let menuItems = [...this.state.menuItems];
+            menuItems.push(body);
+            this.setState({menuItems});
+            alert("Dish has been added");
+            this.closeModal();
+        })
+        
+    }
+
+
     saveRestaurantData(){
-        if(this.validateBasicFromDetail() == false || this.validateExistingMenu() == false) return;
+        if(this.validateBasicFromDetail() == false) return;
         const basicDetails= {
                 name: this.state.restaurantName,
                 location: this.state.restaurantLocation,
@@ -580,65 +564,183 @@ export default class AddRestaurant extends Component {
                 pincode: this.state.restaurantPincode,
                 description: this.state.restaurantDescription
         }
-        console.log(basicDetails);
-        console.log(this.state.dishFormData)
          axios.post('http://localhost:3001/addRestaurantBasicDetail', basicDetails).then(res=>{
             const data = res.data;
             const restaurantId = res.data;
-            console.log(restaurantId);
             localStorage.setItem("restaurantID", restaurantId);
-            // const body = {
-            //         dishFormData: this.state.dishFormData,
-            //         restaurantId: restaurantId
-            // }
-            // axios.post('http://localhost:3001/addRestaurantMenu', body).then(response=>{
-                
-            // })
+            alert("Basic details has been saved");
         });
     }
 
     render(){
         return (
-            <div class="container">
-                    <h5>Basic Details</h5>
-                    <span class='mandatory'>* All Fields are mandatory</span>
-                    <p class='error'>{this.state.errorMessage}</p>
-                    <div class="d-flex justify-content-around">
-                        <input type='text' placeholder="Resturant's Name" value={this.state.restaurantName} onChange={this.restaurantNameHandler}/>
-                        <input type='text' placeholder="Resturant's Location" value={this.state.restaurantLocation} onChange={this.restaurantLocationHandler}/>
-                    </div>
-
-                    <div class="d-flex justify-content-around">
-                        <select placeholder="Select Country" value={this.state.restaurantCountry} onChange={this.handleCountryChange}>
-                            <option value="US">United States</option>
-                            <option value="CA">Canada</option>
-                        </select>
-
-                        <select placeholder="Select Province" value={this.state.restaurantProvience} onChange={this.handleProvinceChange}>
-                            {this.state.provienceForSelectedContry.map(provience=>{
-                                return <option value={provience.abbreviation}>{provience.name}</option>
-                            })}
-                        </select>
-                    </div>
-
-                    <div class="d-flex justify-content-around">
-                        <input type='number' placeholder="Resturant's Pincode" value={this.state.restaurantPincode} onChange={this.restaurantPincodeHandler}/>
-                        <input type='text' placeholder="Resturant's Description" value={this.state.restaurantDescription} onChange={this.restaurantDescriptionHandler}/>
-                    </div>
-
-                 <h5>Menu Details</h5>
-                 {this.state.menuItems.map(list=>{
-                     return this.generateMenuList(list)
-                 })}
-
-                 {this.state.dishForm.map(form=>{
-                     return form;
-                 })}
-                 <button class="btn btn-primary mt-3" onClick={this.generateNewDishForm}>Add +</button>
-                 <div class='d-flex justify-content-evenly'>
-                    <button class="btn btn-success mt-3 w-50" onClick={this.saveRestaurantData}>Submit</button>
-                 </div>
+          <div class="container">
+            <h5>Basic Details</h5>
+            <span class="mandatory">* All Fields are mandatory</span>
+            <p class="error">{this.state.errorMessage}</p>
+            <div class="d-flex justify-content-around">
+              <input
+                type="text"
+                placeholder="Resturant's Name"
+                value={this.state.restaurantName}
+                onChange={this.restaurantNameHandler}
+              />
+              <input
+                type="text"
+                placeholder="Resturant's Location"
+                value={this.state.restaurantLocation}
+                onChange={this.restaurantLocationHandler}
+              />
             </div>
-        )
+
+            <div class="d-flex justify-content-around">
+              <select
+                placeholder="Select Country"
+                value={this.state.restaurantCountry}
+                onChange={this.handleCountryChange}
+              >
+                <option value="US">United States</option>
+                <option value="CA">Canada</option>
+              </select>
+
+              <select
+                placeholder="Select Province"
+                value={this.state.restaurantProvience}
+                onChange={this.handleProvinceChange}
+              >
+                {this.state.provienceForSelectedContry.map((provience) => {
+                  return (
+                    <option value={provience.abbreviation}>
+                      {provience.name}
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
+
+            <div class="d-flex justify-content-around">
+              <input
+                type="number"
+                placeholder="Resturant's Pincode"
+                value={this.state.restaurantPincode}
+                onChange={this.restaurantPincodeHandler}
+              />
+              <input
+                type="text"
+                placeholder="Resturant's Description"
+                value={this.state.restaurantDescription}
+                onChange={this.restaurantDescriptionHandler}
+              />
+            </div>
+
+            <div class="d-flex justify-content-evenly">
+                    <button class="btn btn-success" onClick={this.saveRestaurantData}>Save Basic Details</button>
+
+            </div>
+
+            <h5>Menu Details</h5>
+            <button
+              class="btn btn-primary mt-3"
+              onClick={this.openModal}
+            >
+              Add +
+            </button>
+
+            {this.state.menuItems.map((list) => {
+              return this.generateMenuList(list);
+            })}
+ 
+
+            <CustomizedDialogs open={this.state.open} closeCart={this.closeModal} title="Add Menu">
+              <div class="menuForm">
+                <span class="mandatory">* All Fields are mandatory</span>
+                <p class="error">{this.state.errorMessageOnMenu}</p>
+                <div class="d-flex justify-content-between">
+                  <input
+                    type="text"
+                    placeholder="Dish name"
+                    onChange={
+                      this.handleDishName
+                    }
+                  />
+                  <input
+                    type="number"
+                    placeholder="Dish Price"
+                    onChange={
+                      this.handleDishPrice
+                    }
+                  />
+                  </div>
+                  <div class="d-flex justify-content-between">
+                  <input
+                    type="text"
+                    placeholder="Ingredients (Use comma to seperate)"
+                    onChange={
+                      this.handleDishIngredients
+                    }
+                  />
+                  <input
+                    type="file"
+                    id="img"
+                    name="img"
+                    accept="image/*"
+                  ></input>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                  <select
+                    onChange={
+                      this.handleMealType
+                    }
+                  >
+                    <option value="Breakfast">Breakfast</option>
+                    <option value="Lunch">Lunch</option>
+                    <option value="Snacks">Snacks</option>
+                    <option value="Dinner">Dinner</option>
+                  </select>
+
+                  <select
+                    onChange={
+                      this.handleDishCategory
+                    }
+                  >
+                    <option value="Todays Offer">Todays Offer</option>
+                    <option value="Trending Now">Trending Now</option>
+                    <option value="Healthy Eating">Healthy Eating</option>
+                    <option value="Easy on Pocket">Easy on Pocket</option>
+                  </select>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                  <select
+                    onChange={
+                      this.handleDishType
+                    }
+                  >
+                    <option value="Veg">Veg</option>
+                    <option value="Nonveg">NonVeg</option>
+                  </select>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                  <textarea
+                    type="text"
+                    row="5"
+                    cols="80"
+                    placeholder="Dish Description"
+                    onChange={
+                      this.handleDishDescription
+                    }
+                  />
+                </div>
+            
+
+                <div class="d-flex justify-content-evenly">
+                    <button class="btn btn-success" onClick={this.saveMenu}>Save Dish</button>
+                </div>
+              </div>
+            </CustomizedDialogs>
+          </div>
+        );
     }
 }

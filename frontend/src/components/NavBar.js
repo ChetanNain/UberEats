@@ -125,7 +125,7 @@ export default function ButtonAppBar(props) {
             <Button variant="extended" style={{background: 'grey', color:'black', position:'absolute', right:'2%'}} > Sign in</Button>
         </Toolbar>
       </AppBar>
-      <CustomizedDialog open={openCartVal} closeCart={closeCart}>{cartData.map(cartItem =>{
+      <CustomizedDialog open={openCartVal} closeCart={closeCart} title="Your Cart">{cartData.map(cartItem =>{
         return <CustomerOrders cartItem = {cartItem} removeItem={removeItem}/>
       })} </CustomizedDialog>
     </div>
