@@ -9,9 +9,13 @@ import axios from 'axios';
 
 export default function RestaurantHome() {
   const [data, setData] = React.useState([])
+  const [restaurant, setRestaurant] = React.useState([])
   React.useEffect(() => {
     axios.get('http://localhost:3001/dishes/restaurant/'+localStorage.getItem("restaurantID")).then(res => {
       setData(res.data);
+    })
+    axios.get('http://localhost:3001/restaurants/'+localStorage.getItem("restaurantID")).then(res => { 
+    setRestaurant(res.data[0]);
     })
   }, [])
 return(
@@ -54,13 +58,7 @@ return(
   </Carousel.Item>
 </Carousel>
 <h3 id="DescriptionHeading">  Description </h3>
-<p id="Description">
-    This is a very cool restaurant.  We server good quality food with less preservatives. 
-    LoremPraesent commodo cursus magna, vel scelerisque nisl consectetur.Praesent commodo cursus magna, vel scelerisque nisl consectetur.
-    Praesent commodo cursus magna, vel scelerisque nisl consectetur.Praesent commodo cursus magna, vel scelerisque nisl consectetur.
-    Praesent commodo cursus magna, vel scelerisque nisl consectetur.Praesent commodo cursus magna, vel scelerisque nisl consectetur.
-    Praesent commodo cursus magna, vel scelerisque nisl consectetur.Praesent commodo cursus magna, vel scelerisque nisl consectetur.
-</p>
+<p id="Description">{restaurant.description}</p>
     <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr'}}>
     {data.map(item=>{
         return <Card item={item}/>

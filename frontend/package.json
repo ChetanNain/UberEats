@@ -21,6 +21,7 @@
     "react-bootstrap": "^1.6.3",
     "react-dom": "^17.0.2",
     "react-material-ui-carousel": "^2.3.1",
+    "react-redux": "^7.2.5",
     "react-router-dom": "^5.2.0",
     "react-scripts": "^1.1.5",
     "react-slick": "^0.28.1",

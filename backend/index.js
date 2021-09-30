@@ -45,7 +45,7 @@ app.get('/restaurants', function (req, res) {
 app.get('/restaurants/:id',(req,res)=>{
     connection.query('SELECT * FROM UberEats.Restaurants WHERE ID = ?',[req.params.id], (err, rows, fields)=>{
         if(!err){
-            console.log(rows);
+           res.send(rows);
         }else{
             console.log(err);
         }
@@ -70,7 +70,7 @@ app.post('/restaurants/addDishes',(req,res,next)=>{
 })
 
 app.get('/dishes/:dishTag', function (req, res) {
-    connection.query(`Select dish.dishID as id,dish.dishImage,res.id as restaurantId  , dish.dishName, dish.dishPrice as price, dish.dishTag as dishTag ,res.name from Restaurants as res Inner Join Dishes  as dish ON res.id=dish.restaurantId where dishTag = '${req.params.dishTag}'`, 
+    connection.query(`Select dish.dishID as id,dish.dishImage, dish.dishType as dishType, res.id as restaurantId  , dish.dishName, dish.dishPrice as price, dish.dishTag as dishTag ,res.name from Restaurants as res Inner Join Dishes  as dish ON res.id=dish.restaurantId where dishTag = '${req.params.dishTag}'`, 
     (err, rows, fields)=>{
         if(!err){
             res.send(rows);
@@ -81,7 +81,7 @@ app.get('/dishes/:dishTag', function (req, res) {
 });
 //Dishes by restaurant
 app.get('/dishes/restaurant/:restaurantId', function (req, res) {
-    connection.query(`Select dish.dishID as id,dish.dishImage,res.id as restaurantId  , dish.dishName, dish.dishPrice as price, dish.dishTag as dishTag ,res.name from Restaurants as res Inner Join Dishes  as dish ON res.id=dish.restaurantId where dish.restaurantId = '${req.params.restaurantId}'`, (err, rows, fields)=>{
+    connection.query(`Select dish.dishID as id,dish.dishImage,res.id as restaurantId ,dish.dishType as dishType , dish.dishName, dish.dishPrice as price, dish.dishTag as dishTag ,res.name from Restaurants as res Inner Join Dishes  as dish ON res.id=dish.restaurantId where dish.restaurantId = '${req.params.restaurantId}'`, (err, rows, fields)=>{
         if(!err){
             res.send(rows)
         }else{
@@ -227,6 +227,13 @@ app.post('/addRestaurantBasicDetail', (req,res)=>{
     } )
 })
 
+app.post('/addCustomerDetail', (req,res)=>{
+    let data = [req.body.userName, req.body.fullName, req.body.dateOfBirth, req.body.email, req.body.mobileNumber, req.body.password, '','', req.body.language ]
+    connection.query ('INSERT INTO UberEats.Customers VALUES (?,?,?,?,?,?,?,?,?)', data, (err, results, fields)=>{
+        !err? res.json(req.body.userName): res.json(err);
+    } )
+})
+
 app.post('/addRestaurantMenu', (req,res)=>{
     let data = [ '',req.body.restaurantId, req.body.dishName, req.body.dishIngredients,'', req.body.dishPrice,req.body.dishDescription, req.body.dishCategory, req.body.mealType, req.body.dishType ]
     connection.query ('INSERT INTO UberEats.Dishes VALUES (?,?,?,?,?,?,?,?,?,?)', data, (err, results, fields)=>{
@@ -237,6 +244,24 @@ app.post('/addRestaurantMenu', (req,res)=>{
 
 app.get('/basicDetail/:restaurantID',(req,res) => {
     connection.query(`SELECT * FROM Restaurants where id='${req.params.restaurantID}'`,
+    (err, rows, fields)=>{
+        if(!err){
+            res.send(rows);
+        }else{
+            console.log("Error in delete");
+            console.log(err);
+        }
+    })
+});
+
+app.get('/customerBasicDetail/:username',(req,res) => {
+
+    connection.query(`SELECT Customers.username as userName, Customers.fullName as fullName, Customers.dateOfBirth as dateOfBirth, 
+    Customers.email as email, Customers.mobileNumber as mobileNumber, Customers.Password as password, 
+    Customers.Favorites as Favorites, Customers.ProfilePicture as profilePic, Customers.language as language, 
+    Addresses.Address as address, Addresses.City as city, Addresses.State as state, 
+    Addresses.Country as country FROM Customers inner join Addresses 
+    On (Customers.username = Addresses.username) and Customers.username='${req.params.username}'`,
     (err, rows, fields)=>{
         if(!err){
             res.send(rows);
