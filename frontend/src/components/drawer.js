@@ -107,9 +107,9 @@ export default function PersistentDrawerLeft(props) {
         { name: "Orders", icon: <ReceiptIcon /> },
         { name: "My Restaurant", icon: <HomeWorkIcon /> },
       );
-     list.push(
-      { name: "Login", icon: <PersonIcon /> })
     }
+    list.push(
+      { name: "Login", icon: <PersonIcon /> })
     setDrawerList(list);
   }, [])
 

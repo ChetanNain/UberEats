@@ -1,79 +1,109 @@
 import "./Register.css";
 import React, { Component } from "react";
-import image1 from "../../images/carousel1.jpg";
-import { useState } from "react";
 import axios from "axios";
+import { useSelector, useDispatch } from 'react-redux'
+import { dateOfBirthHandler, emailHandler, languageHandler, mobileNumberHandler, userNameHandler, fullNameHandler, addressHandler, cityHandler, stateHandler, countryHandler, passwordHandler, confirmPasswordHandler, userTypeHandler } from '../../redux/reducers/signUp';
+import Home from '../home/home.js'
 
-export default class Register extends Component {
-  constructor() {
-    super();
-    this.state = {
-      userName: "",
-      fullName: "",
-      dateOfBirth: "",
-      address: "",
-      city: "",
-      state: "",
-      mobileNumber: "",
-      language: "",
-      errorMsg: "",
-      email: "",
-      country: "",
-    //   password: "",
-    //   confirmPassword:""
-    };
-    this.userNameHandler = this.userNameHandler.bind(this);
-    this.mobileNumberHandler = this.mobileNumberHandler.bind(this);
-    this.locationHandler = this.locationHandler.bind(this);
-    this.languageHandler = this.languageHandler.bind(this);
-    this.emailHandler = this.emailHandler.bind(this);
-    this.fullNameHandler = this.fullNameHandler.bind(this);
-    this.dateOfBirthHandler = this.dateOfBirthHandler.bind(this);
-    this.addressHandler = this.addressHandler.bind(this);
-    this.cityHandler = this.cityHandler.bind(this);
-    this.stateHandler = this.stateHandler.bind(this);
-    this.countryHandler = this.countryHandler.bind(this);
-    this.savecustomerData =  this.savecustomerData.bind(this);
-    this.password = this.passwordHandler.bind(this);
-    this.confirmPassword= this.confirmPasswordHandler.bind(this);
+export default function Register(props) {
+  const dispatch = useDispatch();
+  const [errorMessage, setErrorMessage] = React.useState('');
+  const [selectedCountry, setSelectedCountry] = React.useState('US');
+  const [usProvience, setUsProvience] = React.useState(useSelector((state) => state.masterData.usProvience));
+  const [caProvience, setCaProvience] = React.useState(useSelector((state) => state.masterData.caProvience));
+
+  const userName = useSelector((state) => state.signUp.userName);
+  const mobileNumber = useSelector((state) => state.signUp.mobileNumber);
+  const country =  useSelector((state) => state.signUp.country);
+  const state =  useSelector((state) => state.signUp.state);
+  const city =  useSelector((state) => state.signUp.city);
+  const  address = useSelector((state) => state.signUp.address);
+  const  email = useSelector((state) => state.signUp.email);
+  const  fullName = useSelector((state) => state.signUp.fullName);
+  const  dateOfBirth = useSelector((state) => state.signUp.dateOfBirth);
+  const  language = useSelector((state) => state.signUp.language);
+  const  password = useSelector((state) => state.signUp.password);
+  const  confirmPassword = useSelector((state) => state.signUp.confirmPassword);
+  const userType = useSelector((state)=> state.signUp.userType);
+
+  React.useEffect(() => {
+    loadBasicDetails();
+  }, [])
+
+  function loadBasicDetails() {
+    axios.get(
+      "http://localhost:3001/customerBasicDetail/"  + ''
+    ).then(res=>{
+      if(res.data && res.data.length > 0) {
+      dispatch(userNameHandler(res.data[0].userName));
+      dispatch(fullNameHandler(res.data[0].fullName));
+      dispatch(mobileNumberHandler(res.data[0].mobileNumber));
+      dispatch(countryHandler(res.data[0].country));
+      dispatch(stateHandler(res.data[0].state));
+      dispatch(cityHandler(res.data[0].city));
+      dispatch(addressHandler(res.data[0].address));
+      dispatch(emailHandler(res.data[0].email));
+      dispatch(dateOfBirthHandler(res.data[0].dateOfBirth));
+      dispatch(languageHandler(res.data[0].language));
+      dispatch(passwordHandler(res.data[0].password))
+      dispatch(userTypeHandler(res.data[0].userType))
+      }
+    })
+    
   }
 
-  componentDidMount() {
-    this.loadBasicDetails();
-  }
-  async loadBasicDetails() {
-    const res = await axios.get(
-      "http://localhost:3001/customerBasicDetail/"  + localStorage.getItem("userName")
-        //localStorage.getItem("customerID")
-    );
-    this.setState({
-      userName: res.data[0].userName,   
-      mobileNumber: res.data[0].mobileNumber,
-      country: res.data[0].country,
-      state: res.data[0].state,
-      city: res.data[0].city,
-      address: res.data[0].address,
-      email: res.data[0].email,
-      fullName: res.data[0].fullName,
-      dateOfBirth: res.data[0].dateOfBirth,
-      language: res.data[0].language,
-      password: res.data[0].password
-    });
-  }
 
-  savecustomerData() {
+  function valdiate(){
+    console.log(userType.payload);
+    if(userName.payload && userName.payload.length<6){
+       setErrorMessage( "Username must be between 6-20 characters.");
+       return false;
+    }else if( password.payload && password.payload.length<6){
+      setErrorMessage( "Password must be between 6-20 characters.");
+      return false;
+    }else if(email.payload && email.payload.length <6 ){
+      setErrorMessage( "Enter a valid email.");
+      return false;
+    }else if(!city.payload){
+      setErrorMessage("City field is required.");
+      return false;
+    }else if(!address.payload){
+      setErrorMessage("Address field is required.");
+      return false;
+    }
+    else if(confirmPassword.payload != password.payload){
+        setErrorMessage( "Passwords does not match");
+        return false;
+    }else if(['Customer', 'Restaurant'].findIndex((role)=> role == userType.payload) == -1){
+        setErrorMessage("Please select the user type.");
+        return false;
+    }else{
+        setErrorMessage("");
+        return true;
+    }
+
+}
+function validateEmail(email) {
+  const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  return re.test(String(email).toLowerCase());
+}
+
+
+
+   function savecustomerData() {
+    if(!valdiate()) return;
     const basicDetails = {
-      userName: this.state.userName,
-      mobileNumber: this.state.mobileNumber,
-      country: this.state.country,
-      state: this.state.state,
-      city: this.state.city,
-      address: this.state.address,
-      email: this.state.email,
-      fullName: this.state.fullName,
-      dateOfBirth: this.state.dateOfBirth,
-      language: this.state.language,
-      password: this.state.password
+      userName,
+      mobileNumber,
+      country,
+      state,
+      city,
+      address,
+      email,
+      fullName,
+      dateOfBirth,
+      language,
+      password
     };
     axios
       .post("http://localhost:3001/addCustomerDetail", basicDetails)
@@ -83,173 +113,131 @@ export default class Register extends Component {
         alert("Basic details has been saved");
       });
   }
-  
-  dateOfBirthHandler(e) {
-    this.setState({ dateOfBirth: e.target.value });
-  }
-  emailHandler(e) {
-    this.setState({ email: e.target.value });
-  }
-  languageHandler(e) {
-    this.setState({ language: e.target.value });
-  }
-  locationHandler(e) {
-    this.setState({ location: e.target.value });
+
+  function handleCountryChange(e){
+    setSelectedCountry(e.target.value);
+    dispatch(countryHandler(e.target.value));
   }
 
-  mobileNumberHandler(e) {
-    this.setState({ mobileNumber: e.target.value });
-  }
-
-  userNameHandler(e) {
-      console.log("username", e.target.value);
-    this.setState({ userName: e.target.value });
-  }
-
-  fullNameHandler(e) {
-    this.setState({ fullName: e.target.value });
-  }
-  addressHandler(e) {
-    this.setState({ address: e.target.value });
-  }
-  cityHandler(e) {
-    this.setState({ city: e.target.value });
-  }
-  stateHandler(e) {
-    this.setState({ state: e.target.value });
-  }
-  countryHandler(e) {
-    this.setState({ country: e.target.value });
-  }
-  passwordHandler(e) { 
-      this.passwordHandler({ password: e.target.value});
-  }
-  confirmPasswordHandler(e) {
-      this.confirmPasswordHandler({ confirmPassword: e.target.value});
-  }
-
-
-  render() {
-    return (
-      <div class="container">
+  return (
+      <div id="RegisterPage">
         <h5>Basic Details</h5>
         <span class="mandatory">* All Fields are mandatory</span>
-        <p class="error">{this.state.errorMessage}</p>
-        <div class="d-flex justify-content-around">
+        <p class="error">{errorMessage}</p>
+        <div class="d-flex justify-content-around align-items-center">
+            <div class="res">
+            <input type="radio" id="userType" name="userType" value="Restaurant" onChange={(e)=>dispatch(userTypeHandler(e.target.value))}/><span> Restaurant</span>
+            </div>
+            <div class="res">
+            <input type="radio" id="userType" name="userType" value="Customer" onChange={(e)=>dispatch(userTypeHandler(e.target.value))}/><span> Customer</span>
+            </div>
+        </div>   
+        <div class="d-flex justify-content-around align-items-center">
           <input
             type="text"
             placeholder="Full Name"
-            value={this.state.fullName}
-            onChange={this.fullNameHandler}
+            //value={useSelector((state) => state.signUp.fullName).payload}
+            onChange={(e)=>dispatch(fullNameHandler(e.target.value))}
           />
           <input
             type="text"
             placeholder="Username"
-            value={this.state.userName}
-            onChange={this.userNameHandler}
+            //value={useSelector((state) => state.signUp.userName).payload}
+            onChange={(e)=>dispatch(userNameHandler(e.target.value))}
           />
         </div>
-        {/* <div class="d-flex justify-content-around">
+        <div class="d-flex justify-content-around align-items-center">
           <input
             type="password"
             placeholder="Password"
-            value={this.state.password}
-            onChange={this.passwordHandler}
+            //value={useSelector((state) => state.signUp.password).payload}
+            onChange={(e)=>dispatch(passwordHandler(e.target.value))}
           />
           <input
             type="password"
             placeholder="Confirm Password"
-            value={this.state.confirmPassword}
-            onChange={this.confirmPasswordHandler}
+            //value={useSelector((state) => state.signUp.password).payload}
+            onChange={(e)=>dispatch(confirmPasswordHandler(e.target.value))}
           />
-        </div> */}
-        <div class="d-flex justify-content-around">
+        </div>
+        <div class="d-flex justify-content-around align-items-center">
           <input
             type="text"
             placeholder="Date of Birth"
-            value={this.state.dateOfBirth}
-            onChange={this.dateOfBirthHandler}
+            //value={useSelector((state) => state.signUp.dateOfBirth).payload}
+            onChange={(e)=>dispatch(dateOfBirthHandler(e.target.value))}
           />
           <input
-            type="text"
+            type="email"
             placeholder="email"
-            value={this.state.email}
-            onChange={this.emailHandler}
+            value={useSelector((state) => state.signUp.email).payload}
+            onChange={(e)=>dispatch(emailHandler(e.target.value))}
           />
         </div>
-        <div class="d-flex justify-content-around">
+        <div class="d-flex justify-content-around align-items-center">
           <input
-            type="text"
+            type="number"
             placeholder="Mobile Number"
-            value={this.state.mobileNumber}
-            onChange={this.mobileNumberHandler}
+            //value={useSelector((state) => state.signUp.mobileNumber).payload}
+            onChange={(e)=>dispatch(mobileNumberHandler(e.target.value))}
           />
-          <input
-            type="text"
-            placeholder="Language"
-            value={this.state.language}
-            onChange={this.languageHandler}
-          />
+          <select onChange={(e)=>dispatch(languageHandler(e.target.value))}>
+            <option>English</option>
+            <option>French</option>
+            <option>Spanish</option>
+          </select>
         </div>
-        <div class="d-flex justify-content-around">
+        <div class="d-flex justify-content-around align-items-center">
           <input
             type="text"
             placeholder="Address"
-            value={this.state.address}
-            onChange={this.addressHandler}
+            //value={useSelector((state) => state.signUp.address).payload}
+            onChange={(e)=>dispatch(addressHandler(e.target.value))}
           />
           <input
             type="text"
             placeholder="City"
-            value={this.state.city}
-            onChange={this.cityHandler}
+            value={useSelector((state) => state.signUp.city).payload}
+            onChange={(e)=>dispatch(cityHandler(e.target.value))}
           />
         </div>
-        <div class="d-flex justify-content-around">
-          <input
-            type="text"
-            placeholder="State"
-            value={this.state.state}
-            onChange={this.stateHandler}
-          />
-          <input
-            type="text"
-            placeholder="Country"
-            value={this.state.country}
-            onChange={this.countryHandler}
-          />
-        </div>
+        <div class="d-flex justify-content-around align-items-center">
+          <select
+            placeholder="Select Country"
+            //value={useSelector((state) => state.signUp.country).payload}
+            onChange={handleCountryChange}
+          >
+            <option value="US">United States</option>
+            <option value="CA">Canada</option>
+          </select>
+          
+          <select
+            placeholder="Select Province"
+           //value={useSelector((state) => state.signUp.provience).payload}
+            onChange={(e)=> dispatch(stateHandler(e.target.value))}
+          >
+            { selectedCountry == 'US' ? 
+            usProvience.map((provience) => {
+              return (
+                <option value={provience.abbreviation}>{provience.name}</option>
+              );
+            }) : 
+            caProvience.map((provience) => {
+              return (
+                <option value={provience.abbreviation}>{provience.name}</option>
+              );
+            })
+            }
+          </select>
+          </div>
         <br />
         <br />
 
-        <div class="d-flex justify-content-evenly">
-          <button class="btn btn-success" onClick={this.savecustomerData}>
-            Save Basic Details
+        <div class="d-flex justify-content-center">
+          <button class="btn btn-success w-100" onClick={savecustomerData}>
+            Register
           </button>
         </div>
       </div>
     );
   }
-}
-
-{
-  /* <div id="ProfilePage">
-            <img src={image1} alt="Avatar" style= {{borderRadius: '50%', width:'180px', height: '180px', textAlign:'left'}}/><br/><br/>
-            <p>{errMsg}</p>
-            <label> Username : </label> <input type="text" onChange={handleUserName}></input><br/>
-            <label> Full Name : </label> <input type="text" onChange={handleUserName}></input><br/>
-            <label> Date of Birth : </label> <input type="text" onChange={handleUserName}></input><br/>
-            <label> Address : </label> <input type="text" onChange={handleLocation}></input><br/>
-            <label> City: </label> <input type="text" onChange={handleUserName}></input><br/>
-            <label> State: </label> <input type="text" onChange={handleUserName}></input><br/>
-            <label> Mobile Number : </label> <input type="number" name="mobile_number" id="phone_number" pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}"
-           required="required" onChange={handleMobileNumber}></input><br/>
-            <label> Country: </label> <input type="text" onChange={handleUserName}></input><br/>
-            <label> Language : </label> <input type="text" onChange={handleLanguage}></input><br/>
-            <label> Email: </label> <b><input type="text" disabled="disabled" onChange={handleEmail}/></b><br/><br/>
-            <button id="buttonSaveChanges" type="button" onClick={validateForm}>Save Changes</button><br/><br/><br/>
-                <h4>Authorized applications</h4>
-                    <h5>You do not have any authorized applications</h5><br/><br/>
-            <button id="buttonLogout" type="button">Logout</button>
-        </div> */
-}
