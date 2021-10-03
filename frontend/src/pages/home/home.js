@@ -1,7 +1,5 @@
-import CarouselFunc from "../../components/Carousel";
 import React , { Component}  from 'react';
-import SimpleSlider from "../../components/Slick";
-import image1 from '../../images/carousel1.jpg';
+import SimpleSlider from "../../components/Slick/Slick";
 import axios from 'axios';
 import './home.css'
 export default class Home extends React.Component {

@@ -3,17 +3,17 @@
     text-align: center;
     background: white;
     padding: 20px;
-    border-bottom: 8px solid #757575;
-    border-right: 8px solid #757575;
-    border-radius: 10px;
-    margin: auto;
+    margin: 10px auto;
 }
 
-@media only screen and (min-width: 950px) {
+@media only screen and (min-width: 576px) {
   #RegisterPage {
     max-width: 50%;
   }
 }
+
+
+
 
 input[type="text"],
 input[type="password"] {
@@ -67,3 +67,14 @@ input[type="submit"]:hover {
     background-color: #f2f2f2;
     padding: 20px;
   } */
+
+
+  #RegisterPage {
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    transition: 0.1s;
+    background-color: white;
+  }
+  
+  #RegisterPage:hover {
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+  }

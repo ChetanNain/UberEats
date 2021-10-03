@@ -2,8 +2,8 @@
 import React , { Component}  from 'react';
 import Carousel from 'react-bootstrap/Carousel'
 import image1 from '../../images/carousel1.jpg'
-import SimpleSlider from "../../components/Slick";
-import Card from '../../components/Card';
+import SimpleSlider from "../../components/Slick/Slick";
+import Card from '../../components/Card/Card';
 import './RestaurantHome.css'
 import axios from 'axios';
 
@@ -11,10 +11,10 @@ export default function RestaurantHome() {
   const [data, setData] = React.useState([])
   const [restaurant, setRestaurant] = React.useState([])
   React.useEffect(() => {
-    axios.get('http://localhost:3001/dishes/restaurant/'+localStorage.getItem("restaurantID")).then(res => {
+    axios.get('http://localhost:3001/dishes/restaurant/1').then(res => {
       setData(res.data);
     })
-    axios.get('http://localhost:3001/restaurants/'+localStorage.getItem("restaurantID")).then(res => { 
+    axios.get('http://localhost:3001/restaurants/1').then(res => { 
     setRestaurant(res.data[0]);
     })
   }, [])
@@ -59,11 +59,18 @@ return(
 </Carousel>
 <h3 id="DescriptionHeading">  Description </h3>
 <p id="Description">{restaurant.description}</p>
-    <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr'}}>
+  {window.screen.width <= 576 ? <div style={{display: 'grid', gridTemplateColumns: '1fr'}}>
+    {data.map(item=>{
+        return <Card item={item}/>
+    })}
+    </div>: 
+    <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr'}}>
     {data.map(item=>{
         return <Card item={item}/>
     })}
     </div>
+    }
+    
 
 </div>
 )}

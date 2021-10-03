@@ -12,9 +12,7 @@ input[type='file']{
 }
 
 .menuForm {
-  border-bottom: 1px solid black;
   padding: 20px;
-  border-radius: 15px;
   background-color: #fff;
   margin-top: 10px;
 }

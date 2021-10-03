@@ -3,6 +3,7 @@ import { createSlice } from '@reduxjs/toolkit'
 export const signUp = createSlice({
   name: 'signUp',
   initialState: {
+    registrationData: {
       userName: "",
       fullName: "",
       dateOfBirth: "",
@@ -17,51 +18,56 @@ export const signUp = createSlice({
       password: "",
       confirmPassword:"",
       userType: ""
+    }
+      
   },
   reducers: {
+    stateChangeHandler: (state, payload)=>{
+      const data = payload.payload;
+      state.registrationData[data.name] = data.value
+    },
     dateOfBirthHandler: (state, dateOfBirth) =>{
-        state.dateOfBirth = dateOfBirth
+        state.registrationData.dateOfBirth = dateOfBirth
     },
     emailHandler: (state, email) => {
-       state.email = email
+       state.registrationData.email = email
     },
     languageHandler: (state, language)=> {
-        state.language = language
+        state.registrationData.language = language
     },
     mobileNumberHandler: (state, mobileNumber)=> {
-        state.mobileNumber = mobileNumber
+        state.registrationData.mobileNumber = mobileNumber
     },
     userNameHandler: (state, userName) =>{
-        state.userName = userName
+        state.registrationData.userName = userName
     },
     fullNameHandler: (state, fullName) =>{
-        state.fullName = fullName
+        state.registrationData.fullName = fullName
     },
     addressHandler: (state, address)=> {
-        state.address = address
+        state.registrationData.address = address
       },
     cityHandler: (state, city) =>{
-        state.city = city
+        state.registrationData.city = city
     },
     stateHandler: (state,provience) =>{
-        state.provience = provience
+        state.registrationData.provience = provience
     },
     countryHandler: (state, country)=> {
-        state.country = country
+        state.registrationData.country = country
       },
     passwordHandler: (state, password) => { 
-          state.password = password
+          state.registrationData.password = password
       },
     confirmPasswordHandler: (state, confirmPassword)=>{
-        state.confirmPassword = confirmPassword;
+        state.registrationData.confirmPassword = confirmPassword;
     },
     userTypeHandler: (state, userType)=> {
-        state.userType = userType;
+        state.registrationData.userType = userType;
     }
   },
 })
 
-// Action creators are generated for each case reducer function
-export const {dateOfBirthHandler, emailHandler, languageHandler, mobileNumberHandler, userNameHandler, fullNameHandler, addressHandler, cityHandler, stateHandler, countryHandler, passwordHandler, confirmPasswordHandler, userTypeHandler} = signUp.actions
+export const {stateChangeHandler, dateOfBirthHandler, emailHandler, languageHandler, mobileNumberHandler, userNameHandler, fullNameHandler, addressHandler, cityHandler, stateHandler, countryHandler, passwordHandler, confirmPasswordHandler, userTypeHandler} = signUp.actions
 
 export default signUp.reducer

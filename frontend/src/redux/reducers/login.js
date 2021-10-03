@@ -3,24 +3,26 @@ import { createSlice } from '@reduxjs/toolkit'
 export const login = createSlice({
   name: 'login',
   initialState: {
-    mobileNumber: '',
-    password:'',
-    userType: ''
+    loginData: {
+      mobileNumber: '',
+      password:'',
+      userType: ''
+    }
+    
   },
   reducers: {
     setMobileNumber: (state, mobileNumber) => {
-      state.mobileNumber = mobileNumber
+      state.loginData.mobileNumber = mobileNumber
     },
     setPassword: (state, password)=>{
-      state.password = password
+      state.loginData.password = password
     },
     setUserType: (state, userType)=>{
-      state.userType = userType
+      state.loginData.userType = userType
     }
   },
 })
 
-// Action creators are generated for each case reducer function
-export const { setMobileNumber, setPassword, setUserType } = login.actions
+export const { setMobileNumber, setPassword, setUserType } = login.actions;
 
 export default login.reducer
