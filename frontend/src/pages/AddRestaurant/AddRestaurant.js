@@ -40,13 +40,13 @@ export default class AddRestaurant extends Component {
     }
 
     async loadBasicDetails(){
-        const res = await axios.get('http://localhost:3001/basicDetail/1');
+        const url =`http://localhost:3001/basicDetail/${localStorage.getItem("restaurantID")}`;
+        const res = await axios.get(url);
         this.setState({restaurantName:res.data[0].name, restaurantLocation: 'Route 53, Net york', restaurantCountry: res.data[0].country, restaurantProvience: res.data[0].provience, restaurantPincode: res.data[0].pincode, restaurantDescription: res.data[0].description});
     }
 
     async loadMenuItems(){
-     //  const res = await axios.get('http://localhost:3001/basicDetail/' + localStorage.getItem("restaurantID"));
-        const menuItems = await axios.get('http://localhost:3001/menuDetails/1');
+        const menuItems = await axios.get(`http://localhost:3001/menuDetails/${localStorage.getItem("restaurantID")}`);
         this.setState({menuItems: menuItems.data});
     }
 
@@ -384,13 +384,14 @@ export default class AddRestaurant extends Component {
     handleDishType(e) {
         this.setState({dishType: e.target.value});
     }
+    
     handleDishDescription(e){
         this.setState({dishDescription : e.target.value});
     }
 
-    
     removeExstingMenuItem(id){
-        //axios.get(`http://localhost:3001/removeItem/${id}`)
+        console.log(id);
+        axios.get(`http://localhost:3001/removeItem/${id}`)
         const menuItems = [...this.state.menuItems];
         const index = menuItems.findIndex((menu)=>{
             return id == menu.id
@@ -400,6 +401,7 @@ export default class AddRestaurant extends Component {
     }
 
     generateMenuList(data){
+        console.log(data);
         return <div style={{borderBottom: '1px solid black', padding: '10px'}}>
         <div style={{justifyContent: 'space-between', display: 'flex', alignItems: 'center' }}>
             <span>{data.dishName}</span> 
@@ -408,7 +410,7 @@ export default class AddRestaurant extends Component {
             <span>{data.dishTag}</span>
             <span>{data.dishType}</span>
             <span>{data.dishCategory}</span>
-            <a class="link" onClick={()=>this.removeExstingMenuItem(data.id)}>Remove</a>
+            <a class="link" onClick={()=>this.removeExstingMenuItem(data.dishId)}>Remove</a>
         </div>
     </div>
     }

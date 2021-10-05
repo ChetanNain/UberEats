@@ -221,7 +221,7 @@ app.post('/updateOrderStatus',(req,res)=>{
 
 app.post('/addRestaurantBasicDetail', (req,res)=>{
     const restID = uuidv4();
-    let data = [restID, req.body.name, req.body.country, req.body.provience,  req.body.pincode, null, req.body.description, req.body.restaurantUsername, req.body.restaurantPassword ]
+    let data = [restID, req.body.fullName, req.body.country, req.body.provience,  '123456', null, null, req.body.userName, req.body.password ]
     connection.query ('INSERT INTO UberEats.Restaurants VALUES (?,?,?,?,?,?,?,?,?)', data, (err, results, fields)=>{
         !err? res.json(restID): res.json(err);
     } )
@@ -246,6 +246,7 @@ app.get('/basicDetail/:restaurantID',(req,res) => {
     connection.query(`SELECT * FROM Restaurants where id='${req.params.restaurantID}'`,
     (err, rows, fields)=>{
         if(!err){
+            console.log(rows);
             res.send(rows);
         }else{
             console.log("Error in delete");
@@ -273,11 +274,26 @@ app.get('/customerBasicDetail/:username',(req,res) => {
 });
 
 app.get('/menuDetails/:restaurantID',(req,res) => {
+    let val = req.params.restaurantID;
+    console.log(val);
     connection.query(`SELECT * FROM Dishes where restaurantID='${req.params.restaurantID}'`,
     (err, rows, fields)=>{
         if(!err){
             console.log("Reached menu");
             res.send(rows);
+        }else{
+            console.log("Error in delete");
+            console.log(err);
+        }
+    })
+});
+
+app.get('/removeItem/:dishID',(req,res)=> {
+    console.log(req.params.dishID);
+    connection.query(`DELETE FROM Dishes where dishId='${req.params.dishID}'`,
+    (err, rows, fields)=>{
+        if(!err){
+            res.send(200);
         }else{
             console.log("Error in delete");
             console.log(err);
