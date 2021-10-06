@@ -4,7 +4,7 @@ import image1 from '../../images/carousel1.jpg'
 
 export default function CartList(props) {
     return (
-        <div class ="small-container cart-page cardBody">
+        <div className ="small-container cart-page cardBody">
             <table>
                 <tr>
                     <td>
@@ -14,7 +14,7 @@ export default function CartList(props) {
                             <div>
                                 <p>{props.cartItem.dishName}</p>
                                 <small>Price: {props.cartItem.price}</small>
-                                <a style={{color:'#06c167', cursor: 'pointer'}} onClick={()=>props.removeItem(props.cartItem.id)}>Remove</a>
+                                <p className='removeItem' style={{color:'#06c167', cursor: 'pointer'}} onClick={()=>props.removeItem(props.cartItem.id)}>Remove</p>
                             </div>
                         </div>
                     </td>

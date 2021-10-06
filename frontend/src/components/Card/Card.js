@@ -16,20 +16,20 @@ export default function Card(props){
             }
         )
     }
-    return(<div class="cardBody">
-            <img class="card-img-top" src={image1} alt="Card image cap"/>
-                <div class="card-body">
-                <h5 class="card-title">{props.item.restaurant}</h5>
-                            <div class="d-flex justify-content-between align-items-center p-2"><span class="card-text">{props.item.dishName}</span> 
-                                     <span class="card-text">{props.item.price + '$'}</span></div>
+    return(<div className="cardBody">
+            <img className="card-img-top" src={image1} alt="Card image cap"/>
+                <div className="card-body">
+                <h5 className="card-title">{props.item.restaurant}</h5>
+                            <div className="d-flex justify-content-between align-items-center p-2"><span className="card-text">{props.item.dishName}</span> 
+                                     <span className="card-text">{props.item.price + '$'}</span></div>
                             
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div class="d-flex">
-                                    <IconButton aria-label="add to favorites" onClick={addToCart}>
+                            <div className="d-flex justify-content-between align-items-center">
+                                <div className="d-flex">
+                                    <IconButton className="addToCart" aria-label="add to favorites" onClick={addToCart}>
                                         <AddShoppingCartIcon />
                                     </IconButton>
                                     
-                                    <IconButton aria-label="add to favorites">
+                                    <IconButton className="favoriteButton" aria-label="add to favorites">
                                         <FavoriteIcon />
                                     </IconButton>
                                 </div>

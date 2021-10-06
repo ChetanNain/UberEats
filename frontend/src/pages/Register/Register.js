@@ -135,10 +135,10 @@ export default function Register(props) {
     }
   }
 
-  // function handleCountryChange(e) {
-  //   setSelectedCountry(e.target.value);
-  //   dispatch(countryHandler(e.target.value));
-  // }
+  function handleCountryChange(e) {
+    setSelectedCountry(e.target.value);
+    dispatch(stateChangeHandler({ name: "country", value: e.target.value }))
+  }
 
   return (
     <div id="RegisterPage">
@@ -230,10 +230,7 @@ export default function Register(props) {
         />
         <select
           name="language"
-          onChange={(e) =>
-            dispatch(
-              stateChangeHandler({ name: "language", value: e.target.value })
-            )
+          onChange={(e) =>dispatch(stateChangeHandler({ name: "language", value: e.target.value }))
           }
         >
           <option>English</option>
@@ -267,11 +264,7 @@ export default function Register(props) {
         <select
           placeholder="Select Country"
           name="country"
-          onChange={(e) =>
-            dispatch(
-              stateChangeHandler({ name: "country", value: e.target.value })
-            )
-          }
+          onChange={(e)=>handleCountryChange(e)}
         >
           <option value="US">United States</option>
           <option value="CA">Canada</option>
