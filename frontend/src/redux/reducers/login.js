@@ -8,7 +8,6 @@ export const login = createSlice({
       password:'',
       userType: ''
     }
-    
   },
   reducers: {
     setMobileNumber: (state, mobileNumber) => {

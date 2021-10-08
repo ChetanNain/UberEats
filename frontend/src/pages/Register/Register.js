@@ -4,11 +4,13 @@ import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
 import {stateChangeHandler} from "../../redux/reducers/signUp";
 import Restaurant from "@mui/icons-material/Restaurant";
+import Card from "../../components/Card/Card";
 
 export default function Register(props) {
   const dispatch = useDispatch();
   const [errorMessage, setErrorMessage] = React.useState("");
   const [selectedCountry, setSelectedCountry] = React.useState("US");
+  const [data, setData] = React.useState([{dishName: 'Burger', price: '4'}, {dishName: 'Burger', price: '4'}, {dishName: 'Burger', price: '4'}]);
   const [usProvience, setUsProvience] = React.useState(
     useSelector((state) => state.masterData.usProvience)
   );
@@ -21,49 +23,43 @@ export default function Register(props) {
   );
 
   React.useEffect(() => {
+    const headerConfig = {
+      headers: {
+          'x-authentication-header': localStorage.getItem('token')
+        }
+    }
     loadBasicDetails();
+    axios.get("http://localhost:3001/cart", headerConfig).then((res) => {
+      setData(res.data);
+    });
   }, []);
 
   function loadBasicDetails() {
-    axios.get("http://localhost:3001/customerBasicDetail/" + "").then((res) => {
-      if (res.data && res.data.length > 0) {
-        dispatch(stateChangeHandler({ name: "userName", value: res.data[0].userName }));
-        dispatch(stateChangeHandler({ name: "fullName", value: res.data[0].fullName }));
-        dispatch(stateChangeHandler({ name: "mobileNumber", value: res.data[0].mobileNumber }));
-        dispatch(stateChangeHandler({ name: "country", value: res.data[0].country }));
-        dispatch(stateChangeHandler({ name: "provience", value: res.data[0].state }));
-        dispatch(stateChangeHandler({ name: "address", value: res.data[0].address }));
-        dispatch(stateChangeHandler({ name: "email", value: res.data[0].email }));
-        dispatch(stateChangeHandler({ name: "dateOfBirth", value: res.data[0].dateOfBirth }));
-        dispatch(stateChangeHandler({ name: "language", value: res.data[0].language }));
-        dispatch(stateChangeHandler({ name: "password", value: res.data[0].password }));
-        dispatch(stateChangeHandler({ name: "userType", value: res.data[0].userType }));
-        // dispatch(userNameHandler(res.data[0].userName));
-        // dispatch(fullNameHandler(res.data[0].fullName));
-        // dispatch(mobileNumberHandler(res.data[0].mobileNumber));
-        // dispatch(countryHandler(res.data[0].country));
-        // dispatch(stateHandler(res.data[0].state));
-        // dispatch(cityHandler(res.data[0].city));
-        // dispatch(addressHandler(res.data[0].address));
-        // dispatch(emailHandler(res.data[0].email));
-        // dispatch(dateOfBirthHandler(res.data[0].dateOfBirth));
-        // dispatch(languageHandler(res.data[0].language));
-        // dispatch(passwordHandler(res.data[0].password));
-        // dispatch(userTypeHandler(res.data[0].userType));
+    const headerConfig = {
+      headers: {
+          'x-authentication-header': localStorage.getItem('token')
+        }
+    }
+    axios.get("http://localhost:3001/customerBasicDetail", headerConfig).then((res) => {
+      if (res.data) {
+        dispatch(stateChangeHandler({ name: "fullName", value: res.data.fullName }));
+        dispatch(stateChangeHandler({ name: "mobileNumber", value: res.data.mobileNumber }));
+        dispatch(stateChangeHandler({ name: "country", value: res.data.country }));
+        dispatch(stateChangeHandler({ name: "provience", value: res.data.state }));
+        dispatch(stateChangeHandler({ name: "address", value: res.data.address }));
+        dispatch(stateChangeHandler({ name: "email", value: res.data.email }));
+        dispatch(stateChangeHandler({ name: "dateOfBirth", value: res.data.dateOfBirth }));
+        dispatch(stateChangeHandler({ name: "language", value: res.data.language }));
+        dispatch(stateChangeHandler({ name: "password", value: res.data.password }));
+        dispatch(stateChangeHandler({ name: "userType", value: res.data.userType }));
+        dispatch(stateChangeHandler({ name: "city", value: res.data.city }));
       }
     });
   }
 
   function valdiate() {
     if (!registrationData.fullName) {
-      //console.log(registrationData);
       setErrorMessage("Name can't be empty");
-      return false;
-    } else if (
-      registrationData.userName &&
-      registrationData.userName.length < 6
-    ) {
-      setErrorMessage("Username must be between 6-20 characters.");
       return false;
     } else if (
       registrationData.password &&
@@ -116,23 +112,13 @@ export default function Register(props) {
   function savecustomerData() {
     if (!valdiate()) return;
     const basicDetails = { ...registrationData };
-    console.log(basicDetails.userType);
-    if(basicDetails.userType=='Customer'){
     axios
       .post("http://localhost:3001/addCustomerDetail", basicDetails)
       .then((res) => {
-        console.log("hit customer");
-        props.history.push('');
+        localStorage.setItem('token', res.data.token);
+        localStorage.setItem('role', res.data.data.role);
+        props.history.push('/');
       });
-    }else{
-      axios
-      .post("http://localhost:3001/addRestaurantBasicDetail", basicDetails)
-      .then((res) => {
-        console.log("hit restaurant");
-        localStorage.setItem("restaurantID", res.data);
-        props.history.push('');
-      });
-    }
   }
 
   function handleCountryChange(e) {
@@ -141,6 +127,7 @@ export default function Register(props) {
   }
 
   return (
+    <div>
     <div id="RegisterPage">
       <h5>Basic Details</h5>
       <span class="mandatory">* All Fields are mandatory</span>
@@ -150,6 +137,7 @@ export default function Register(props) {
           type="text"
           placeholder="Full Name"
           name="fullName"
+          value = {registrationData.fullName}
           onChange={(e) =>
             dispatch(
               stateChangeHandler({ name: "fullName", value: e.target.value })
@@ -158,11 +146,12 @@ export default function Register(props) {
         />
         <input
           type="text"
-          placeholder="Username"
-          name="userName"
+          placeholder="Date of Birth"
+          name="dateOfBirth"
+          value = {registrationData.dateOfBirth}
           onChange={(e) =>
             dispatch(
-              stateChangeHandler({ name: "userName", value: e.target.value })
+              stateChangeHandler({ name: "dateOfBirth", value: e.target.value })
             )
           }
         />
@@ -172,6 +161,7 @@ export default function Register(props) {
           type="password"
           placeholder="Password"
           name="password"
+          value = {registrationData.password}
           onChange={(e) =>
             dispatch(
               stateChangeHandler({ name: "password", value: e.target.value })
@@ -193,32 +183,12 @@ export default function Register(props) {
         />
       </div>
       <div class="d-flex justify-content-around align-items-center">
-        <input
-          type="text"
-          placeholder="Date of Birth"
-          name="dateOfBirth"
-          onChange={(e) =>
-            dispatch(
-              stateChangeHandler({ name: "dateOfBirth", value: e.target.value })
-            )
-          }
-        />
-        <input
-          type="email"
-          placeholder="email"
-          name="email"
-          onChange={(e) =>
-            dispatch(
-              stateChangeHandler({ name: "email", value: e.target.value })
-            )
-          }
-        />
-      </div>
-      <div class="d-flex justify-content-around align-items-center">
-        <input
+      <input
           type="number"
           placeholder="Mobile Number"
           name="mobileNumber"
+          disabled={localStorage.getItem("role") ? true : false}
+          value = {registrationData.mobileNumber}
           onChange={(e) =>
             dispatch(
               stateChangeHandler({
@@ -228,21 +198,27 @@ export default function Register(props) {
             )
           }
         />
-        <select
-          name="language"
-          onChange={(e) =>dispatch(stateChangeHandler({ name: "language", value: e.target.value }))
+        <input
+          type="email"
+          placeholder="email"
+          name="email"
+          value = {registrationData.email}
+          onChange={(e) =>
+            dispatch(
+              stateChangeHandler({ name: "email", value: e.target.value })
+            )
           }
-        >
-          <option>English</option>
-          <option>French</option>
-          <option>Spanish</option>
-        </select>
+        />
+      </div>
+      <div class="d-flex justify-content-around align-items-center">
+
       </div>
       <div class="d-flex justify-content-around align-items-center">
         <input
           type="text"
           placeholder="Address"
           name="address"
+          value = {registrationData.address}
           onChange={(e) =>
             dispatch(
               stateChangeHandler({ name: "address", value: e.target.value })
@@ -253,6 +229,7 @@ export default function Register(props) {
           type="text"
           placeholder="City"
           name="city"
+          value = {registrationData.city}
           onChange={(e) =>
             dispatch(
               stateChangeHandler({ name: "city", value: e.target.value })
@@ -264,15 +241,16 @@ export default function Register(props) {
         <select
           placeholder="Select Country"
           name="country"
+          value = {registrationData.country}
           onChange={(e)=>handleCountryChange(e)}
         >
           <option value="US">United States</option>
           <option value="CA">Canada</option>
         </select>
-
         <select
           placeholder="Select Province"
           name="provience"
+          value = {registrationData.provience}
           onChange={(e) =>
             dispatch(
               stateChangeHandler({ name: "provience", value: e.target.value })
@@ -296,8 +274,18 @@ export default function Register(props) {
               })}
         </select>
       </div>
-
       <div class="d-flex justify-content-start align-items-center my-3">
+        <select
+          name="language"
+          value = {registrationData.language}
+          onChange={(e) =>dispatch(stateChangeHandler({ name: "language", value: e.target.value }))
+          }
+        >
+          <option>English</option>
+          <option>French</option>
+          <option>Spanish</option>
+        </select>
+        <div  className={localStorage.getItem('role') ? 'd-none' : 'd-block'}>
         <div class="res">
           <input
             type="radio"
@@ -326,34 +314,20 @@ export default function Register(props) {
           />
           <span> Customer</span>
         </div>
+        </div>
       </div>
-
       <div class="d-flex justify-content-center">
         <button class="btn btn-success w-100" onClick={savecustomerData}>
-          Register
+          {localStorage.getItem("role") ? 'Update' : 'Register' }
         </button>
       </div>
     </div>
+    <p>Favorites</p>
+      <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr'}}>
+        {data.map(item=>{
+            return item.checkedOut == 2 ? <Card item={item}/> : ''
+        })}
+    </div>
+    </div>
   );
 }
-
-
-
-
-
-
-
-// ,
-//   dateOfBirthHandler,
-//   emailHandler,
-//   languageHandler,
-//   mobileNumberHandler,
-//   userNameHandler,
-//   fullNameHandler,
-//   addressHandler,
-//   cityHandler,
-//   stateHandler,
-//   countryHandler,
-//   passwordHandler,
-//   confirmPasswordHandler,
-//   userTypeHandler,

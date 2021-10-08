@@ -294,9 +294,20 @@ export const masterData = createSlice({
         name: "Yukon Territory",
         abbreviation: "YT",
       },
-    ]
-  }
+    ],
+    homePageFilters: {
+      searchQuery: '',
+    }
+  },
+  reducers: {
+    homePageFilterChangeHandler: (state, filter) => {
+      const payload = filter.payload;
+      state[payload.name] = payload.value;
+    }
+  },
 })
+
+export const { homePageFilterChangeHandler } = masterData.actions;
 
 export default masterData.reducer;
 

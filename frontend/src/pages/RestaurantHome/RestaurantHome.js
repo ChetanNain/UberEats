@@ -7,17 +7,34 @@ import Card from '../../components/Card/Card';
 import './RestaurantHome.css'
 import axios from 'axios';
 
-export default function RestaurantHome() {
+export default function RestaurantHome(props) {
   const [data, setData] = React.useState([])
   const [restaurant, setRestaurant] = React.useState([])
+  const search = props.location.search;
+  const resId = new URLSearchParams(search).get('resId');
   React.useEffect(() => {
-    axios.get('http://localhost:3001/dishes/restaurant/1').then(res => {
+    const headerConfig = {
+      headers: {
+          'x-authentication-header': localStorage.getItem('token')
+        }
+    }
+    if(!resId){
+      axios.get('http://localhost:3001/restaurantDishes', headerConfig).then(res => {
+        setData(res.data);
+      })
+      axios.get('http://localhost:3001/restaurants', headerConfig).then(res => { 
+      setRestaurant(res.data[0]);
+      })
+  }else{
+    axios.get('http://localhost:3001/restaurantDishes?restaurandId='+ resId, headerConfig).then(res => {
       setData(res.data);
     })
-    axios.get('http://localhost:3001/restaurants/1').then(res => { 
+    axios.get('http://localhost:3001/restaurants?restaurandId='+ resId, headerConfig).then(res => { 
     setRestaurant(res.data[0]);
-    })
+  })
+  }
   }, [])
+
 return(
     <div>
     <Carousel>

@@ -4,20 +4,19 @@ export const signUp = createSlice({
   name: "signUp",
   initialState: {
     registrationData: {
-      userName: "",
       fullName: "",
       dateOfBirth: "",
+      password: "",
+      confirmPassword: "",
+      mobileNumber: "",
+      email: "",
       address: "",
       city: "",
       provience: "AL",
-      mobileNumber: "",
-      language: "English",
-      errorMsg: "",
-      email: "",
       country: "US",
-      password: "",
-      confirmPassword: "",
-      userType: "",
+      errorMsg: "",
+      language: "English",
+      userType: ""
     },
   },
   reducers: {

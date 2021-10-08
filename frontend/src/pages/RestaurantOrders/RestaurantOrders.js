@@ -8,12 +8,17 @@ export default function RestaurantOrders() {
                             orderID : id
                         }
             await axios.post('http://localhost:3001/updateOrderStatus',data)
-            alert(id);
+            alert("Status Updated");
     }
     const [orders, setOrders] = React.useState([]);
     React.useEffect(() => {
         console.log("use effect");
-        axios.get('http://localhost:3001/getRestaurantOrders/1').then(res => {
+        const headerConfig = {
+            headers: {
+                'x-authentication-header': localStorage.getItem('token')
+              }
+          }
+        axios.get('http://localhost:3001/orders', headerConfig).then(res => {
         setOrders(res.data);
     })
   }, [])
@@ -23,17 +28,17 @@ export default function RestaurantOrders() {
                 return <div class="orderList">
                         <div style={{justifyContent: 'space-between', display: 'flex', alignItems: 'center' }}>
                             <span>{order.orderID}</span> 
-                            <span>{order.customerID}</span>
-                            <span>{order.dishName}</span>
-                            <span>01/01/2021  15:34</span>
-                            <span>{order.orderStatus == 1 ? "Received" : order.orderStatus==2 ? "Preparing Now" : "Delivered" }</span>
+                            <span>{order.customerMobile}</span>
+                            <span>{order.restaurantMobile}</span>
+                            <span>{order.dishID}</span>
+                            <span class="py-3">{order.orderStatus == 0 ? 'Recieved' : order.orderStatus == 1 ? 'Preparing Now': order.orderStatus == 2 ? 'Delivered' :order.orderStatus == 3 ?  'Rejected' : ''}</span>
                             <div class="w-30">
-                                <select onChange={(event)=>UpdateOrderStatus(order.orderID, event)}>
-                                    <option value="1">Received</option>
-                                    <option value="2">Preparing Now</option>
-                                    <option value="3">Delivered</option>
-                                    <option value="4">Reject</option>
-                                </select>
+                                {localStorage.getItem("role") ==1 ? <select onChange={(event)=>UpdateOrderStatus(order.orderID, event)}>
+                                    <option value="0">Received</option>
+                                    <option value="1">Preparing Now</option>
+                                    <option value="2">Delivered</option>
+                                    <option value="3">Reject</option>
+                                </select> : null}
                             </div>
                         </div>
                     </div>

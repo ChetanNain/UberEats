@@ -30,6 +30,8 @@ import CustomizedDialog from "../Dialog/Dialog";
 import axios from "axios";
 import CartList from '../../pages/CartList/CartList'
 import LogoutIcon from '@mui/icons-material/Logout';
+import { useSelector, useDispatch } from 'react-redux';
+import { homePageFilterChangeHandler } from '../../redux/reducers/masterData';
 
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 
@@ -92,26 +94,31 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function CustomDrawer() {
+export default function CustomDrawer(props) {
   const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
   const [openCartVal, setOpenCart] = useState(false);
   const [cartData, setCartData] = useState([]);
+  const dispatch = useDispatch();
 
   const drawerList = [
-        {to: '/', name: "Home", icon: <HomeIcon /> },
-        {to: '/add-restaurant', name: "Add Restaurant", icon: <RestaurantIcon /> },
+        {to: '/', name: "Home", icon: <HomeIcon />, role: 0},
+        {to: '/add-restaurant', name: "Add Restaurant", icon: <RestaurantIcon />, role: 1},
         {to: '/orders', name: "Orders", icon: <ReceiptIcon /> },
-        {to: '/my-restaurant', name: "My Restaurant", icon: <HomeWorkIcon /> },
-        {to: '/login', name: "Login", icon: <PersonIcon /> },
-        {to: '/register', name: "Register", icon: <PersonIcon /> },
-        {to: '/logout', name: "Logout", icon: <LogoutIcon /> },
+        {to: '/my-restaurant', name: "Restaurant Homepage", icon: <HomeWorkIcon />, role: 1},
+        
   ];
 
   useEffect(() => {
-    axios.get("http://localhost:3001/cart").then((res) => {
-      setCartData(res.data);
+    const headerConfig = {
+      headers: {
+          'x-authentication-header': localStorage.getItem('token')
+        }
+    }
+    axios.get("http://localhost:3001/cart", headerConfig).then((res) => {
+      const data = res.data.filter(e=> e.checkedOut == 0);
+      setCartData(data);
     });
   }, []);
 
@@ -140,7 +147,36 @@ export default function CustomDrawer() {
   function toggleDrawer(){
     setOpen(!open);
   }
+  function checkout(){
+    const headerConfig = {
+      headers: {
+          'x-authentication-header': localStorage.getItem('token')
+        }
+    }
+    axios.get('http://localhost:3001/checkout',headerConfig ).then(res=>{
+      toggleCart();
+    })
+  }
 
+  function handleLogout(){
+    const headerConfig = {
+      headers: {
+          'x-authentication-header': localStorage.getItem('token')
+        }
+    }
+    /* axios.get('http://localhost:3001/logout', headerConfig).then(res=>{
+      localStorage.removeItem("role");
+      localStorage.removeItem("token");
+    }) */
+    localStorage.removeItem("role");
+    localStorage.removeItem("token");
+    props.forceRender();
+  }
+function handleSearchText(e){
+  if (e.key === 'Enter') {
+    dispatch(homePageFilterChangeHandler({name: 'searchQuery', value: e.target.value}));
+  }
+}
 
   return (
     <Router>
@@ -159,7 +195,7 @@ export default function CustomDrawer() {
           </IconButton>
           <h5 className={classes.title} style={{ color: "black", fontSize: "30px", margin: "0px" }}>Uber</h5>
           <h5 className={classes.title} style={{ color: "#06c167", fontSize: "30px", margin: "0px" }}>Eats</h5>
-            {/* <div class="w-50"><input type="text" id="searchText" placeholder="Search..."/></div> */}
+          <div class="w-50"><input type="text" id="searchText" placeholder="Search..." onKeyDown={handleSearchText}/></div>
           <ShoppingCart style={{position: 'absolute', right: '5%'}} onClick={toggleCart}/><span class="cartValue">{cartData.length}</span>
           </Toolbar>
       </AppBar>
@@ -184,7 +220,7 @@ export default function CustomDrawer() {
         <Divider />
         <List>
           {drawerList.map((item) => (
-            <Link to={item.to} className="nav-link" style={{color: 'gray', fontWeight: 'bold'}}>
+            <Link to={item.to} className="nav-link" onClick={props.forceRender} style={{color: 'gray', fontWeight: 'bold', display: !item.role  || localStorage.getItem('role') == item.role ? 'block' : 'none'}}>
               <ListItem
                 button
                 key={item.name}>
@@ -193,6 +229,31 @@ export default function CustomDrawer() {
               </ListItem>
             </Link> 
           ))}
+          
+          <Link to='/login' className="nav-link" onClick={props.forceRender} style={{color: 'gray', fontWeight: 'bold', display: localStorage.getItem('role') ? 'none' : 'block'}}>
+            <ListItem
+                  button
+                  key="Login">
+                    <ListItemIcon><PersonIcon /></ListItemIcon>
+                    <ListItemText primary="Login"/> 
+            </ListItem>
+          </Link> 
+          <Link to={!localStorage.getItem('role') ? '/register': '/profile'} onClick={props.forceRender} className="nav-link" style={{color: 'gray', fontWeight: 'bold'}}>
+            <ListItem
+                  button
+                  key={!localStorage.getItem('role') ? 'Register': 'Profile'}>
+                    <ListItemIcon><PersonIcon /></ListItemIcon>
+                    <ListItemText primary={!localStorage.getItem('role') ? 'Register': 'Profile'}/> 
+            </ListItem>
+          </Link>
+          <Link to='/logout' className="nav-link" onClick={handleLogout} style={{color: 'gray', fontWeight: 'bold', display: !localStorage.getItem('role') ? 'none' : 'block'}}>
+            <ListItem
+                  button
+                  key="Logout">
+                    <ListItemIcon><LogoutIcon /></ListItemIcon>
+                    <ListItemText primary="Logout"/> 
+            </ListItem>
+          </Link>
         </List>
       </Drawer>
       <main
@@ -208,6 +269,7 @@ export default function CustomDrawer() {
             <Route exact path='/orders' component={RestaurantOrders} />
             <Route exact path='/my-restaurant' component={RestaurantHome} />
             <Route exact path='/register' component={Register} />
+            <Route exact path='/profile' component={Register} />
             <Route exact path='/logout' component={Login} />
           </Switch>
       </main>
@@ -216,7 +278,7 @@ export default function CustomDrawer() {
         open={openCartVal}
         closeCart={toggleCart}
         title="Cart"
-        //action={}
+        action={checkout}
         actionLabel="Proceed to checkout">
         {cartData.map((cartItem) => {
           return <CartList cartItem={cartItem} removeItem={removeItem} />;

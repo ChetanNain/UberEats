@@ -54,7 +54,7 @@ export default class SimpleSlider extends React.Component {
         <Slider {...this.settings}>
 
           {this.props.data.map((dish) =>
-              <Card item={dish} />
+              <Card item={dish} navigate={this.props.navigate} />
           )}
 
         </Slider>

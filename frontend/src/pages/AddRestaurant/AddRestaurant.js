@@ -10,6 +10,7 @@ export default class AddRestaurant extends Component {
             provienceForSelectedContry: this.countryAndProvince[0].states,
             restaurantName: '',
             restaurantLocation: '',
+            restaurantCity: '',
             restaurantCountry: 'US',
             restaurantProvience: 'AL',
             restaurantPincode: '',
@@ -39,14 +40,24 @@ export default class AddRestaurant extends Component {
         this.loadMenuItems();
     }
 
-    async loadBasicDetails(){
-        const url =`http://localhost:3001/basicDetail/${localStorage.getItem("restaurantID")}`;
-        const res = await axios.get(url);
-        this.setState({restaurantName:res.data[0].name, restaurantLocation: 'Route 53, Net york', restaurantCountry: res.data[0].country, restaurantProvience: res.data[0].provience, restaurantPincode: res.data[0].pincode, restaurantDescription: res.data[0].description});
+     loadBasicDetails(){
+        const headerConfig = {
+            headers: {
+                'x-authentication-header': localStorage.getItem('token')
+              }
+          }
+        axios.get('http://localhost:3001/basicDetail', headerConfig).then(res=>{
+            this.setState({restaurantName:res.data.name, restaurantLocation: res.data.address, restaurantCity: res.data.city, restaurantCountry: res.data.country, restaurantProvience: res.data.provience, restaurantPincode: res.data.pincode, restaurantDescription: res.data.description});
+        })    
     }
 
     async loadMenuItems(){
-        const menuItems = await axios.get(`http://localhost:3001/menuDetails/${localStorage.getItem("restaurantID")}`);
+        const headerConfig = {
+            headers: {
+                'x-authentication-header': localStorage.getItem('token')
+              }
+          }
+        const menuItems = await axios.get(`http://localhost:3001/menuDetails`, headerConfig);
         this.setState({menuItems: menuItems.data});
     }
 
@@ -477,6 +488,11 @@ export default class AddRestaurant extends Component {
 
 
     saveMenu(){
+        const headerConfig = {
+            headers: {
+                'x-authentication-header': localStorage.getItem('token')
+              }
+          }
         if(this.validateBasicFromDetail() == false || this.validateMenuForm() == false) return;
         const body = {
             dishName: this.state.dishName,
@@ -486,9 +502,9 @@ export default class AddRestaurant extends Component {
             mealType: this.state.mealType,
             dishCategory: this.state.dishCategory,
             dishType: this.state.dishType,
-            restaurantId: localStorage.getItem("restaurantID") || 1
+            restaurantMobileNumber: localStorage.getItem("restaurantMobileNumber") || 1
         }
-         axios.post('http://localhost:3001/addRestaurantMenu', body).then(response=>{ 
+         axios.post('http://localhost:3001/addRestaurantMenu', body, headerConfig).then(response=>{ 
             let menuItems = [...this.state.menuItems];
             menuItems.push(body);
             this.setState({menuItems});
@@ -502,17 +518,21 @@ export default class AddRestaurant extends Component {
     saveRestaurantData(){
         if(this.validateBasicFromDetail() == false) return;
         const basicDetails= {
-                name: this.state.restaurantName,
-                location: this.state.restaurantLocation,
-                country: this.state.restaurantCountry,
-                provience: this.state.restaurantProvience,
-                pincode: this.state.restaurantPincode,
-                description: this.state.restaurantDescription
+                restaurantName: this.state.restaurantName,
+                restaurantAddress: this.state.restaurantAddress,
+                restaurantCity: this.state.restaurantCity,
+                restaurantProvience: this.state.restaurantProvience,
+                restaurantCountry: this.state.restaurantCountry,
+                restaurantPincode: this.state.restaurantPincode,
+                restaurantDescription: this.state.restaurantDescription
         }
-         axios.post('http://localhost:3001/addRestaurantBasicDetail', basicDetails).then(res=>{
-            const data = res.data;
-            const restaurantId = res.data;
-            localStorage.setItem("restaurantID", restaurantId);
+
+        const headerConfig = {
+            headers: {
+                'x-authentication-header': localStorage.getItem('token')
+              }
+          }
+         axios.post('http://localhost:3001/addRestaurantBasicDetail', basicDetails, headerConfig).then(res=>{
             alert("Basic details has been saved");
         });
     }

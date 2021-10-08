@@ -76,7 +76,7 @@
 
 @media only screen and (max-width: 600px) {
   #searchText {
-    display: none;
+    /* display: none; */
   }
 }
 

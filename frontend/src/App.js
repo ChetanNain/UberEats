@@ -3,9 +3,11 @@ import './App.css';
 import CustomDrawer from './components/Drawer/Drawer';
 function App() {
 
+  let [id, setId] = React.useState(1);
+
   return (
     <div className="App">
-        <CustomDrawer/>
+        <CustomDrawer key={id} forceRender={()=>setId(id++)} />
       </div>
   );
 }
