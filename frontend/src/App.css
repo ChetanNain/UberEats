@@ -78,6 +78,9 @@
   #searchText {
     /* display: none; */
   }
+.slider-wrapper {
+  width: 20rem !important;
+}
 }
 
 .slider-wrapper {

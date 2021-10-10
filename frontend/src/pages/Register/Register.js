@@ -1,16 +1,20 @@
 import "./Register.css";
-import React, { Component } from "react";
+import React, { Component, useState } from "react";
 import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
 import {stateChangeHandler} from "../../redux/reducers/signUp";
 import Restaurant from "@mui/icons-material/Restaurant";
 import Card from "../../components/Card/Card";
+import PopUp from "../../components/Popup/Popup";
 
 export default function Register(props) {
   const dispatch = useDispatch();
   const [errorMessage, setErrorMessage] = React.useState("");
   const [selectedCountry, setSelectedCountry] = React.useState("US");
+  const [open, setOpen] = useState(false);
+  const [uploadedFile, setUploadedFile] = React.useState('');
   const [data, setData] = React.useState([{dishName: 'Burger', price: '4'}, {dishName: 'Burger', price: '4'}, {dishName: 'Burger', price: '4'}]);
+  const [profilePic, setProfilePic] = React.useState('');
   const [usProvience, setUsProvience] = React.useState(
     useSelector((state) => state.masterData.usProvience)
   );
@@ -21,6 +25,7 @@ export default function Register(props) {
   const registrationData = useSelector(
     (state) => state.signUp.registrationData
   );
+
 
   React.useEffect(() => {
     const headerConfig = {
@@ -53,30 +58,22 @@ export default function Register(props) {
         dispatch(stateChangeHandler({ name: "password", value: res.data.password }));
         dispatch(stateChangeHandler({ name: "userType", value: res.data.userType }));
         dispatch(stateChangeHandler({ name: "city", value: res.data.city }));
+        setProfilePic(`http://localhost:3001/resources/${res.data.favorites}`);
       }
     });
   }
 
   function valdiate() {
-    if (!registrationData.fullName) {
+    if (!registrationData.fullName) { 
       setErrorMessage("Name can't be empty");
       return false;
-    } else if (
-      registrationData.password &&
-      registrationData.password.length < 6
-    ) {
+    } else if (registrationData.password && registrationData.password.length < 6) {
       setErrorMessage("Password must be between 6-20 characters.");
       return false;
-    } else if (
-      registrationData.email &&
-      registrationData.email.length < 6
-    ) {
+    } else if (registrationData.email && !validateEmail(registrationData.email)) {
       setErrorMessage("Enter a valid email.");
       return false;
-    } else if (
-      registrationData.mobileNumber &&
-      registrationData.mobileNumber.length < 10
-    ) {
+    } else if (registrationData.mobileNumber && registrationData.mobileNumber.length < 10) {
       setErrorMessage("Enter a valid mobile number.");
       return false;
     } else if (!registrationData.address) {
@@ -85,10 +82,7 @@ export default function Register(props) {
     } else if (!registrationData.city) {
       setErrorMessage("City field is required.");
       return false;
-    } else if (
-      registrationData.confirmPassword !=
-      registrationData.password
-    ) {
+    } else if (registrationData.confirmPassword != registrationData.password) {
       setErrorMessage("Passwords does not match");
       return false;
     } else if (
@@ -100,18 +94,22 @@ export default function Register(props) {
       return false;
     } else {
       setErrorMessage("");
+      setOpen(true);
+      setTimeout(()=>{
+        setOpen(false);
+      }, 2000)
       return true;
     }
   }
   function validateEmail(email) {
-    const re =
-      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    console.log(email);
+    const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return re.test(String(email).toLowerCase());
   }
 
   function savecustomerData() {
     if (!valdiate()) return;
-    const basicDetails = { ...registrationData };
+    const basicDetails = { ...registrationData, uploadedFile };
     axios
       .post("http://localhost:3001/addCustomerDetail", basicDetails)
       .then((res) => {
@@ -126,11 +124,36 @@ export default function Register(props) {
     dispatch(stateChangeHandler({ name: "country", value: e.target.value }))
   }
 
+  function uploadImage(e){
+    const config = {
+      headers: {
+          'content-type': 'multipart/form-data'
+      }
+  };
+  const formData = new FormData();
+  formData.append('myImage', e.target.files[0]);
+      axios.post("http://localhost:3001/upload",formData,config)
+          .then((res) => {
+           setUploadedFile(res.data.fileName);
+          }).catch((error) => {
+      });
+  }
+
   return (
     <div>
     <div id="RegisterPage">
-      <h5>Basic Details</h5>
+    <h5>Basic Details</h5>
       <span class="mandatory">* All Fields are mandatory</span>
+      <div class="profilePic">
+          <img src={profilePic}/>
+      </div>
+      <input
+        type="file"
+        id="img"
+        name="img"
+        accept="image/*"
+        onChange={uploadImage}
+      />
       <p class="error">{errorMessage}</p>
       <div class="d-flex justify-content-around align-items-center">
         <input
@@ -322,12 +345,15 @@ export default function Register(props) {
         </button>
       </div>
     </div>
+    <div style={{display: localStorage.getItem('role') ? 'block' : 'none'}}>
     <p>Favorites</p>
       <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr'}}>
         {data.map(item=>{
-            return item.checkedOut == 2 ? <Card item={item}/> : ''
+            return item.checkedOut === 2 ? <Card item={item}/> : ''
         })}
     </div>
+    </div>
+    <PopUp open={open} message={"Account created!"}/>
     </div>
   );
 }

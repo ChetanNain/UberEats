@@ -65,7 +65,11 @@ export default function CustomizedDialogs(props) {
           {props.title}
         </BootstrapDialogTitle>
             <div style={{height: '80%', overflowY: 'scroll', boxShadow: '4px 0px 4px 0 rgb(0 0 0 / 20%)'}}>{props.children}</div>
-            <div className="d-flex justify-content-center m-3"><button className="btn btn-success" onClick={props.action}>{props.actionLabel}</button></div>
+            <div className="d-flex justify-content-around m-3">
+              
+            {props.actionLabel ? <button className="btn btn-success" onClick={props.action}>{props.actionLabel}</button> :''}
+              {props.secondaryActionLabel ? <button className="btn btn-danger" onClick={props.secondaryAction}>{props.secondaryActionLabel}</button> :''}
+            </div>
       </BootstrapDialog>
     </div>
   );

@@ -1,70 +1,37 @@
-import React , { Component}  from 'react';
+import React, { Component }  from 'react';
 import SimpleSlider from "../../components/Slick/Slick";
 import axios from 'axios';
-import './home.css'
-export default class Home extends React.Component {
-    constructor(props) {
+import './home.css';
+import { connect } from 'react-redux';
+
+export class Home extends Component{
+    constructor(props){
         super(props);
-        this.state = { 
-            trendingNow: [],
-            easyOnPocket: [],
-            healthyEating: [],
-            todaysOffer: []
-         };
-         this.navigateToRestaurantHome = this.navigateToRestaurantHome.bind(this);
-      }
-
-    componentDidMount(){
-        this.loadTrendingNow();
-        this.loadEasyOnPocket();
-        this.loadHealthyEating();
-        this.loadTodaysOffer();
-    }
-
-    headerConfig = {
-        headers: {
-            'x-authentication-header': localStorage.getItem('token')
-          }
-        }
-    loadTrendingNow(){
-        axios.get('http://localhost:3001/dishes/Trending Now', this.headerConfig).then(res=>{
-            this.setState({trendingNow: res.data})
-        })
+        this.navigateToRestaurantHome = this.navigateToRestaurantHome.bind(this);
     }
 
     navigateToRestaurantHome(restaurantId){
-        console.log(restaurantId);
-        this.props.history.push('/my-restaurant/');
+        this.props.history.push('/my-restaurant?resId='+restaurantId);
     }
 
-    loadTodaysOffer(){
-        axios.get('http://localhost:3001/dishes/Todays Offer', this.headerConfig).then(res=>{
-            this.setState({todaysOffer: res.data})
-        })
-    }
-
-    loadHealthyEating(){
-        axios.get('http://localhost:3001/dishes/Healthy Eating', this.headerConfig).then(res=>{
-            this.setState({healthyEating: res.data})
-        })
-    }
-
-    loadEasyOnPocket(){
-        axios.get('http://localhost:3001/dishes/Easy on Pocket', this.headerConfig).then(res=>{
-            this.setState({easyOnPocket: res.data})
-        })
-    }
-
-    render() {
+    render(){
+        console.log(this.props.applyFilter, "hello")
         return (
             <div>
-                <SimpleSlider data = {this.state.todaysOffer} slickHeading = "Todays Offer" navigate = {this.navigateToRestaurantHome}/><br/>
-                <SimpleSlider data = {this.state.trendingNow} slickHeading = "Trending Now" navigate={this.navigateToRestaurantHome}/><br/>
-                <SimpleSlider data = {this.state.healthyEating} slickHeading = "Healthy Eating" navigate={this.navigateToRestaurantHome}/><br/>
-                <SimpleSlider data = {this.state.easyOnPocket} slickHeading = "Easy On Pocket" navigate={this.navigateToRestaurantHome}/><br/>
+                <SimpleSlider data = {this.props.dishes.filter(dish=> dish.dishCategory == 'Trending Now')} slickHeading = "Trending Now" navigate={this.navigateToRestaurantHome}/>
+                <SimpleSlider data = {this.props.dishes.filter(dish=> dish.dishCategory == 'Healthy Eating')} slickHeading = "Healthy Eating" navigate={this.navigateToRestaurantHome}/>
+                <SimpleSlider data = {this.props.dishes.filter(dish=> dish.dishCategory == 'Easy on Pocket')} slickHeading = "Easy On Pocket" navigate={this.navigateToRestaurantHome}/>
+                <SimpleSlider data = {this.props.dishes.filter(dish=> dish.dishCategory == 'Todays Offer')} slickHeading = "Todays Offer" navigate={this.navigateToRestaurantHome}/>
             </div>
         )
     }
-
-
 }
+
+function mapStateToProps(state, ownProps) {
+    return {
+        dishes: state.masterData.dishes
+    };
+}
+
+
+export default connect(mapStateToProps)(Home);

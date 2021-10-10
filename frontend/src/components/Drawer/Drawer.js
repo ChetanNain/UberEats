@@ -30,9 +30,12 @@ import CustomizedDialog from "../Dialog/Dialog";
 import axios from "axios";
 import CartList from '../../pages/CartList/CartList'
 import LogoutIcon from '@mui/icons-material/Logout';
+import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import { useSelector, useDispatch } from 'react-redux';
-import { homePageFilterChangeHandler } from '../../redux/reducers/masterData';
-
+import Checkout from '../../pages/checkout/Checkout';
+import { handleFilterChange, updateDishes, handleClearFilter } from '../../redux/reducers/masterData';
+import SearchIcon from '@mui/icons-material/Search';
+import { useHistory } from 'react-router-dom';
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 
 const drawerWidth = 240;
@@ -101,26 +104,39 @@ export default function CustomDrawer(props) {
   const [openCartVal, setOpenCart] = useState(false);
   const [cartData, setCartData] = useState([]);
   const dispatch = useDispatch();
+  const [openFilter, setOpenFilter] = useState(false);
+  const [openSearch, setOpenSearch] = useState(false);
+  const [drawerList] = useState([
+    {to: '/', name: "Home", icon: <HomeIcon />, role: 0},
+    {to: '/add-restaurant', name: "Add Restaurant", icon: <RestaurantIcon />, role: 1},
+    {to: '/my-restaurant', name: "Restaurant Homepage", icon: <HomeWorkIcon />, role: 1}
+]);
+  let filters = useSelector((state) => state.masterData.filters);
 
-  const drawerList = [
-        {to: '/', name: "Home", icon: <HomeIcon />, role: 0},
-        {to: '/add-restaurant', name: "Add Restaurant", icon: <RestaurantIcon />, role: 1},
-        {to: '/orders', name: "Orders", icon: <ReceiptIcon /> },
-        {to: '/my-restaurant', name: "Restaurant Homepage", icon: <HomeWorkIcon />, role: 1},
-        
-  ];
+  const headerConfig = {
+    headers: {
+        'x-authentication-header': localStorage.getItem('token')
+      }
+  }
+  const history = useHistory();
+
+  function toggleSearch(){
+    setOpenSearch(!openSearch)
+  }
 
   useEffect(() => {
-    const headerConfig = {
-      headers: {
-          'x-authentication-header': localStorage.getItem('token')
-        }
-    }
     axios.get("http://localhost:3001/cart", headerConfig).then((res) => {
       const data = res.data.filter(e=> e.checkedOut == 0);
       setCartData(data);
     });
+    loadDishData();
   }, []);
+
+  function loadDishData(){
+    axios.post('http://localhost:3001/dishes', filters, headerConfig).then(res=>{
+      dispatch(updateDishes(res.data));
+    })
+  }
 
   function toggleCart(){
     setOpenCart(!openCartVal);
@@ -148,14 +164,16 @@ export default function CustomDrawer(props) {
     setOpen(!open);
   }
   function checkout(){
-    const headerConfig = {
+    history.push('/checkout');
+    toggleCart();
+    /* const headerConfig = {
       headers: {
           'x-authentication-header': localStorage.getItem('token')
         }
     }
     axios.get('http://localhost:3001/checkout',headerConfig ).then(res=>{
       toggleCart();
-    })
+    }) */
   }
 
   function handleLogout(){
@@ -164,19 +182,66 @@ export default function CustomDrawer(props) {
           'x-authentication-header': localStorage.getItem('token')
         }
     }
-    /* axios.get('http://localhost:3001/logout', headerConfig).then(res=>{
+    axios.get('http://localhost:3001/logout', headerConfig).then(res=>{
+      localStorage.setItem("token", res.data.token);
       localStorage.removeItem("role");
       localStorage.removeItem("token");
-    }) */
-    localStorage.removeItem("role");
-    localStorage.removeItem("token");
-    props.forceRender();
+    })
+    forceRender();
   }
-function handleSearchText(e){
-  if (e.key === 'Enter') {
-    dispatch(homePageFilterChangeHandler({name: 'searchQuery', value: e.target.value}));
+  function handleSearchText(e){
+    if(e.key === 'Enter'){
+      filters = {
+        ...filters,
+        searchQuery: e.target.value
+      }
+      toggleSearch();
+      loadDishData();
+    }
   }
-}
+
+  function handleFilterSelect(e){
+    dispatch(handleFilterChange({name: e.target.name, value: e.target.value}));
+  }
+
+  function toggleFilter(){
+    setOpenFilter(!openFilter)
+  }
+
+  function applyFilter(){
+    toggleFilter();
+    loadDishData();
+  }
+
+  function clearAndCloseFilter(){
+      dispatch(handleClearFilter());
+      filters = {
+        searchQuery: '',
+        mealType: [],
+        dishCategory: [],
+        dishType: [],
+        restaurants: []
+      }
+      loadDishData();
+  }
+
+  function clearFilter(){
+    toggleFilter();
+    dispatch(handleClearFilter());
+    filters = {
+      searchQuery: '',
+      mealType: [],
+      dishCategory: [],
+      dishType: [],
+      restaurants: []
+    }
+    loadDishData();
+  }
+
+ function forceRender(){
+  setOpen(false);
+  props.forceRender();
+ }
 
   return (
     <Router>
@@ -195,7 +260,8 @@ function handleSearchText(e){
           </IconButton>
           <h5 className={classes.title} style={{ color: "black", fontSize: "30px", margin: "0px" }}>Uber</h5>
           <h5 className={classes.title} style={{ color: "#06c167", fontSize: "30px", margin: "0px" }}>Eats</h5>
-          <div class="w-50"><input type="text" id="searchText" placeholder="Search..." onKeyDown={handleSearchText}/></div>
+          <div style={{position: 'absolute', right: '35%', cursor: 'pointer'}}><SearchIcon onClick={toggleSearch} /><span></span></div>
+          <div style={{position: 'absolute', right: '25%', cursor: 'pointer'}}><FilterAltIcon onClick={toggleFilter} /><span style={{position: 'absolute', cursor: 'pointer', textDecoration: 'underline'}} onClick={clearAndCloseFilter}>Clear</span></div>
           <ShoppingCart style={{position: 'absolute', right: '5%'}} onClick={toggleCart}/><span class="cartValue">{cartData.length}</span>
           </Toolbar>
       </AppBar>
@@ -220,7 +286,7 @@ function handleSearchText(e){
         <Divider />
         <List>
           {drawerList.map((item) => (
-            <Link to={item.to} className="nav-link" onClick={props.forceRender} style={{color: 'gray', fontWeight: 'bold', display: !item.role  || localStorage.getItem('role') == item.role ? 'block' : 'none'}}>
+            <Link to={item.to} className="nav-link" onClick={forceRender} style={{color: 'gray', fontWeight: 'bold', display: !item.role  || localStorage.getItem('role') == item.role ? 'block' : 'none'}}>
               <ListItem
                 button
                 key={item.name}>
@@ -230,7 +296,16 @@ function handleSearchText(e){
             </Link> 
           ))}
           
-          <Link to='/login' className="nav-link" onClick={props.forceRender} style={{color: 'gray', fontWeight: 'bold', display: localStorage.getItem('role') ? 'none' : 'block'}}>
+          <Link to='/orders' className="nav-link" onClick={forceRender} style={{color: 'gray', fontWeight: 'bold', display: localStorage.getItem('role') ? 'block' : 'none'}}>
+            <ListItem
+                  button
+                  key="Orders">
+                    <ListItemIcon><ReceiptIcon /></ListItemIcon>
+                    <ListItemText primary="Orders"/> 
+            </ListItem>
+          </Link> 
+
+          <Link to='/login' className="nav-link" onClick={forceRender} style={{color: 'gray', fontWeight: 'bold', display: localStorage.getItem('role') ? 'none' : 'block'}}>
             <ListItem
                   button
                   key="Login">
@@ -238,7 +313,7 @@ function handleSearchText(e){
                     <ListItemText primary="Login"/> 
             </ListItem>
           </Link> 
-          <Link to={!localStorage.getItem('role') ? '/register': '/profile'} onClick={props.forceRender} className="nav-link" style={{color: 'gray', fontWeight: 'bold'}}>
+          <Link to={!localStorage.getItem('role') ? '/register': '/profile'} onClick={forceRender} className="nav-link" style={{color: 'gray', fontWeight: 'bold'}}>
             <ListItem
                   button
                   key={!localStorage.getItem('role') ? 'Register': 'Profile'}>
@@ -271,6 +346,7 @@ function handleSearchText(e){
             <Route exact path='/register' component={Register} />
             <Route exact path='/profile' component={Register} />
             <Route exact path='/logout' component={Login} />
+            <Route path='/checkout' component={Checkout} />
           </Switch>
       </main>
 
@@ -278,11 +354,58 @@ function handleSearchText(e){
         open={openCartVal}
         closeCart={toggleCart}
         title="Cart"
-        action={checkout}
-        actionLabel="Proceed to checkout">
-        {cartData.map((cartItem) => {
-          return <CartList cartItem={cartItem} removeItem={removeItem} />;
-        })}
+        //action={checkout}
+        actionLabel="">
+            {cartData.map((cartItem) => {
+              return <CartList cartItem={cartItem} removeItem={removeItem} />;
+            })}
+        <center><Link to='/checkout' onClick={checkout}>
+          <button class="btn btn-success">Proceed To checkout</button>
+        </Link></center>
+      </CustomizedDialog>
+
+      <CustomizedDialog
+        open={openSearch}
+        closeCart={toggleSearch}
+        title="Search">
+          <div style={{width: '90%'}}>
+          <input type="text" placeholder='(Veg, Dinner, Burger etc..)' onKeyDown={handleSearchText} />
+          </div>
+      </CustomizedDialog>
+
+
+      <CustomizedDialog
+        open={openFilter}
+        closeCart={toggleFilter}
+        title="Filter"
+        action={applyFilter}
+        actionLabel="Apply Filter"
+        secondaryAction={clearFilter}
+        secondaryActionLabel="Clear Filter">
+        <div class='d-md-flex justify-content-between'>
+          <div style={{padding: '20px', width: '150px'}}>
+            <p>Meal Type</p>
+            <div class='d-flex justify-content-between'><span><input type='checkbox' name='mealType' onChange={handleFilterSelect} value='Breakfast' checked={filters.mealType.includes('Breakfast') ? true : false}/></span><span>Breakfast</span></div>
+            <div class='d-flex justify-content-between'><span><input type='checkbox' name='mealType' onChange={handleFilterSelect} value='Lunch' checked={filters.mealType.includes('Lunch') ? true : false}/></span><span>Lunch</span></div>
+            <div class='d-flex justify-content-between'><span><input type='checkbox' name='mealType' onChange={handleFilterSelect} value='Snacks' checked={filters.mealType.includes('Snacks') ? true : false}/></span><span>Snacks</span></div>
+            <div class='d-flex justify-content-between'><span><input type='checkbox' name='mealType' onChange={handleFilterSelect} value='Dinner' checked={filters.mealType.includes('Dinner') ? true : false}/></span><span>Dinner</span></div>
+          </div>
+          <div style={{padding: '20px', width: '180px'}}>
+            <p>Dish Category</p>
+            <div class='d-flex justify-content-between'><span><input type='checkbox' name='dishCategory' onChange={handleFilterSelect} value='Todays Offer' checked={filters.dishCategory.includes('Todays Offer') ? true : false}/></span><span>Todays Offer</span></div>
+            <div class='d-flex justify-content-between'><span><input type='checkbox' name='dishCategory' onChange={handleFilterSelect} value='Trending Now' checked={filters.dishCategory.includes('Trending Now') ? true : false}/></span><span>Trending Now</span></div>
+            <div class='d-flex justify-content-between'><span><input type='checkbox' name='dishCategory' onChange={handleFilterSelect} value='Healthy Eating' checked={filters.dishCategory.includes('Healthy Eating') ? true : false}/></span><span>Healthy Eating</span></div>
+            <div class='d-flex justify-content-between'><span><input type='checkbox' name='dishCategory' onChange={handleFilterSelect} value='Easy on Pocket' checked={filters.dishCategory.includes('Easy on Pocket') ? true : false}/></span><span>Easy on Pocket</span></div>
+          </div>
+          <div style={{padding: '20px', width: '150px'}}>
+            <p>Dish Type</p>
+            <div class='d-flex justify-content-between'><span><input type='checkbox' name='dishType' onChange={handleFilterSelect} value='Veg' checked={filters.dishType.includes('Veg') ? true : false}/></span><span>Veg</span></div>
+            <div class='d-flex justify-content-between'><span><input type='checkbox' name='dishType' onChange={handleFilterSelect} value='Non veg' checked={filters.dishType.includes('Non veg') ? true : false}/></span><span>Non Veg</span></div>
+          </div>
+          {/* <div style={{padding: '20px', width: '150px'}}>
+             <p>Restaurants</p>
+          </div> */}
+        </div>
       </CustomizedDialog>
     </div>
     </Router>

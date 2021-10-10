@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import './AddRestaurant.css';
 import axios from 'axios';
 import CustomizedDialogs from '../../components/Dialog/Dialog';
+import PopUp from '../../components/Popup/Popup';
 
 export default class AddRestaurant extends Component {
     constructor(){
@@ -25,7 +26,10 @@ export default class AddRestaurant extends Component {
             dishType:'Veg',
             open: false,
             errorMessageOnMenu: '',
-            dishDescription:''
+            dishDescription:'',
+            uploadedFile: '',
+            openConfirmation: false,
+            message: ''
         }
         this.toggleModal = this.toggleModal.bind(this);
         this.validateBasicFromDetail = this.validateBasicFromDetail.bind(this);
@@ -47,7 +51,9 @@ export default class AddRestaurant extends Component {
               }
           }
         axios.get('http://localhost:3001/basicDetail', headerConfig).then(res=>{
-            this.setState({restaurantName:res.data.name, restaurantLocation: res.data.address, restaurantCity: res.data.city, restaurantCountry: res.data.country, restaurantProvience: res.data.provience, restaurantPincode: res.data.pincode, restaurantDescription: res.data.description});
+            if(res.data){
+                this.setState({restaurantName:res.data.name, restaurantLocation: res.data.city, restaurantCity: res.data.city, restaurantCountry: res.data.country, restaurantProvience: res.data.provience, restaurantPincode: res.data.pincode, restaurantDescription: res.data.description});
+            }
         })    
     }
 
@@ -468,16 +474,16 @@ export default class AddRestaurant extends Component {
     }
 
     validateBasicFromDetail(){
-        if(this.state.restaurantName.length < 1) {
+        if(this.state.restaurantName == null || this.state.restaurantName?.length < 1) {
             this.setState({errorMessage: 'Enter a valid restaurant name'})
             return false;
-        }if(this.state.restaurantLocation.length < 1) {
+        }if(this.state.restaurantLocation == null || this.state.restaurantLocation?.length < 1) {
             this.setState({errorMessage: 'Enter a valid location'})
             return false;
-        }if(this.state.restaurantPincode.length < 5) {
+        }if(this.state.restaurantPincode == null || this.state.restaurantPincode?.length < 5) {
             this.setState({errorMessage: 'Enter a valid pin code'})
             return false;
-        }if(this.state.restaurantDescription.length < 1) {
+        }if(this.state.restaurantDescription == null || this.state.restaurantDescription?.length < 1) {
             this.setState({errorMessage: 'Enter a valid description'})
             return false;
         }else{
@@ -490,7 +496,7 @@ export default class AddRestaurant extends Component {
     saveMenu(){
         const headerConfig = {
             headers: {
-                'x-authentication-header': localStorage.getItem('token')
+                'x-authentication-header': localStorage.getItem('token'),
               }
           }
         if(this.validateBasicFromDetail() == false || this.validateMenuForm() == false) return;
@@ -502,27 +508,46 @@ export default class AddRestaurant extends Component {
             mealType: this.state.mealType,
             dishCategory: this.state.dishCategory,
             dishType: this.state.dishType,
-            restaurantMobileNumber: localStorage.getItem("restaurantMobileNumber") || 1
+            restaurantMobileNumber: localStorage.getItem("restaurantMobileNumber"),
+            image: this.state.uploadedFile
         }
          axios.post('http://localhost:3001/addRestaurantMenu', body, headerConfig).then(response=>{ 
             let menuItems = [...this.state.menuItems];
             menuItems.push(body);
             this.setState({menuItems});
-            alert("Dish has been added");
+            this.setState({openConfirmation: true, message: 'Dish has been added!'})
+            setTimeout(() => {
+               this.setState({openConfirmation: false, message: ''})
+            }, 2000);
             this.toggleModal();
         })
         
     }
 
+    uploadImage(e){
+        const config = {
+            headers: {
+                'content-type': 'multipart/form-data'
+            }
+        };
+        const formData = new FormData();
+        formData.append('myImage', e.target.files[0]);
+        axios.post("http://localhost:3001/upload",formData,config)
+            .then((res) => {
+               this.setState({uploadedFile: res.data.fileName});
+            }).catch((error) => {
+        });
+    }
+
 
     saveRestaurantData(){
-        if(this.validateBasicFromDetail() == false) return;
+        if(this.validateBasicFromDetail() === false) return;
         const basicDetails= {
                 restaurantName: this.state.restaurantName,
                 restaurantAddress: this.state.restaurantAddress,
-                restaurantCity: this.state.restaurantCity,
-                restaurantProvience: this.state.restaurantProvience,
-                restaurantCountry: this.state.restaurantCountry,
+                restaurantCity: this.state.restaurantLocation,
+                restaurantProvience: this.state.restaurantProvience || 'US',
+                restaurantCountry: this.state.restaurantCountry || 'AL',
                 restaurantPincode: this.state.restaurantPincode,
                 restaurantDescription: this.state.restaurantDescription
         }
@@ -533,7 +558,10 @@ export default class AddRestaurant extends Component {
               }
           }
          axios.post('http://localhost:3001/addRestaurantBasicDetail', basicDetails, headerConfig).then(res=>{
-            alert("Basic details has been saved");
+            this.setState({openConfirmation: true, message: 'Basic details has been saved!'})
+            setTimeout(() => {
+               this.setState({openConfirmation: false, message: ''})
+            }, 2000);
         });
     }
 
@@ -649,7 +677,8 @@ export default class AddRestaurant extends Component {
                     id="img"
                     name="img"
                     accept="image/*"
-                  ></input>
+                    onChange={this.uploadImage.bind(this)}
+                  />
                 </div>
 
                 <div class="d-flex justify-content-between">
@@ -700,6 +729,7 @@ export default class AddRestaurant extends Component {
                 </div>
               </div>
             </CustomizedDialogs>
+            <PopUp open={this.state.openConfirmation} message={this.state.message}/>
           </div>
         );
     }

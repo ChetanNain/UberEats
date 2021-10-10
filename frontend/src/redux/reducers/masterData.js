@@ -295,19 +295,46 @@ export const masterData = createSlice({
         abbreviation: "YT",
       },
     ],
-    homePageFilters: {
+    filters: {
       searchQuery: '',
-    }
+      mealType: [],
+      dishCategory: [],
+      dishType: [],
+      restaurants: []
+    },
+    dishes: [],
   },
   reducers: {
-    homePageFilterChangeHandler: (state, filter) => {
+    handleFilterChange: (state, filter) => {
       const payload = filter.payload;
-      state[payload.name] = payload.value;
+      if(payload.name == 'searchQuery'){
+        state.filters[payload.name] = payload.value;
+      }else{
+        const index = state.filters[payload.name].findIndex(el=> payload.value === el);
+        if(index === -1){
+          state.filters[payload.name].push(payload.value);
+        }else{
+          state.filters[payload.name].splice(index, 1);
+        }
+       
+      }
+    },
+    updateDishes: (state, dishes)=>{
+      state.dishes = dishes.payload;
+    },
+    handleClearFilter: (state)=>{
+      state.filters = {
+        searchQuery: '',
+        mealType: [],
+        dishCategory: [],
+        dishType: [],
+        restaurants: []
+      }
     }
   },
 })
 
-export const { homePageFilterChangeHandler } = masterData.actions;
+export const { handleFilterChange, handleApplyFilter, updateDishes, handleClearFilter  } = masterData.actions;
 
 export default masterData.reducer;
 

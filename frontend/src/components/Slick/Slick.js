@@ -31,14 +31,14 @@ export default class SimpleSlider extends React.Component {
             breakpoint: 500,
             settings: {
               arrows: false,
-              slidesToShow: 2
+              slidesToShow: 1
             }
           },
           {
             breakpoint: 400,
             settings: {
               arrows: false,
-              slidesToShow: 2
+              slidesToShow: 1
             }
           }
         ]
@@ -48,7 +48,6 @@ export default class SimpleSlider extends React.Component {
     return (
 
       <div className="App">
-
       <div className="slider-wrapper">
       <p>{this.props.slickHeading}</p>
         <Slider {...this.settings}>

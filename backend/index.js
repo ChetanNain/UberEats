@@ -6,7 +6,22 @@ const cors = require('cors')
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 var jwt = require('jsonwebtoken');
+const multer = require("multer");
+const path = require("path");
 
+let fileName;
+const storage = multer.diskStorage({
+   destination: "./public/uploads/",
+   filename: function(req, file, cb){
+       fileName = "IMAGE-" + Date.now() + path.extname(file.originalname);
+       cb(null, fileName);
+   }
+});
+
+const upload = multer({
+   storage: storage,
+   limits:{fileSize: 1000000},
+}).single("myImage");
 
 var app = express();
 app.use(express.json());
@@ -34,7 +49,7 @@ app.use(cors())
 app.get('/restaurants',(req,res)=>{
     const tokenHeader = req.headers['x-authentication-header'];
     var decoded = jwt.verify(tokenHeader, 'my-secret-key-0001xx01212032432');
-    const restaurantMobileNumber = req.query.restaurandId ? req.query.restaurandId : decoded.data.mobileNumber;
+    const restaurantMobileNumber = req.query?.restaurandId ? req.query?.restaurandId : decoded.data.mobileNumber;
     connection.query('SELECT * FROM UberEats.Restaurants WHERE mobileNumber = ?', restaurantMobileNumber, (err, rows, fields)=>{
         if(!err){
            res.send(rows);
@@ -60,10 +75,24 @@ app.post('/restaurants/addDishes',(req,res,next)=>{
     })
 })
 
-app.get('/dishes/:dishTag', function (req, res) {
-    connection.query(`Select dish.dishId as id, dish.dishImage, dish.dishType as dishType, res.mobileNumber as mobileNumber, dish.dishName, dish.dishPrice as price, dish.dishTag as dishTag ,res.name from Restaurants as res Inner Join Dishes  as dish ON res.mobileNumber=dish.restaurantMobileNumber where dishTag = '${req.params.dishTag}'`, 
+app.post('/dishes', function (req, res) {
+    const filters = req.body;
+    let query = 'Select dish.dishId as id, dish.dishImage, dish.dishType as dishType, res.mobileNumber as mobileNumber, dish.dishName, dish.dishCategory, dish.dishPrice as price, dish.dishTag as dishTag ,res.name from Restaurants as res Inner Join Dishes  as dish ON res.mobileNumber=dish.restaurantMobileNumber where 1 = 1';
+    if(filters.mealType?.length){
+        query +=` AND dishTag in ("${filters.mealType.join('", "')}") `;
+    }
+    if(filters.dishType?.length){
+        query +=` AND dishType in ("${filters.dishType.join('", "')}") `;
+    }
+    if(filters.dishCategory?.length){
+        query +=` AND dishCategory in ("${filters.dishCategory.join('", "')}") `;
+    }
+    connection.query(query, 
     (err, rows, fields)=>{
         if(!err){
+            if(filters.searchQuery){
+                rows = rows.filter(row => [row.dishName, row.dishTag, row.dishType, row.name, row.dishCategory].includes(filters.searchQuery));
+            }
             res.send(rows);
         }else{
             console.log(err);
@@ -171,11 +200,11 @@ app.post('/removeFromCart', (req, res) =>{
     
 })
 
-app.get('/cart', function(req,res){
+app.get('/cart', verifyToken, function(req,res){
         const tokenHeader = req.headers['x-authentication-header'];
         var decoded = jwt.verify(tokenHeader, 'my-secret-key-0001xx01212032432');
         console.log(decoded);
-        connection.query(`select dish.dishID as id, dish.dishImage,res.name, res.mobileNumber as restaurantMobileNumber , dish.dishName, dish.dishPrice as price, cart.checkedOut from cart, Restaurants as res, Dishes as dish where cart.dishId = dish.dishId and cart.restaurantMobileNumber = res.mobileNumber and cart.customerMobileNumber=${decoded.data.mobileNumber};`,
+        connection.query(`select dish.dishID as id, dish.dishImage, res.name, res.mobileNumber as restaurantMobileNumber , dish.dishName, dish.dishPrice as price, cart.checkedOut from cart, Restaurants as res, Dishes as dish where cart.dishId = dish.dishId and cart.restaurantMobileNumber = res.mobileNumber and cart.customerMobileNumber=${decoded.data.mobileNumber};`,
         
         (err, rows, fields)=>{
             console.log(rows);
@@ -205,17 +234,29 @@ app.get('/orders', (req, res) =>{
 })
 
 
-/* app.get("/logout", validateToken, function (req, res) {
-    const authHeader = req.headers["authorization"];
-    jwt.sign(authHeader, "", { expiresIn: 1 } , (logout, err) => {
-    if (logout) {
-    res.send({msg : 'You have been Logged Out' });
-    } else {
-    res.send({msg:'Error'});
-    }
-    });
+app.get("/logout", function (req, res) {
+    const tokenHeader = req.headers['x-authentication-header'];
+    var decoded = jwt.verify(tokenHeader, 'my-secret-key-0001xx01212032432');
+    const token = jwt.sign({
+        data: {
+            fullName: decoded.data.fullName,
+            email: decoded.data.email,
+            mobileNumber: decoded.data.mobileNumber,
+            role: decoded.data.restFlg,
+        }
+      }, 'my-secret-key-0001xx01212032432', { expiresIn: '-1s' });
+      res.status(200).json({
+        token: token,
+        msg: 'Logged out successfully',
+        data: {
+         fullName:  decoded.data.fullName,
+         email:  decoded.data.email,
+         mobileNumber:  decoded.data.mobileNumber,
+         role:  decoded.data.restFlg
+        }
+    })
 });
- */
+
 app.post('/removeFromCart', (req, res) =>{
     const itemId = req.body.itemId;
     console.log(itemId);
@@ -265,9 +306,7 @@ app.post('/addCustomerDetail', (req,res)=>{
         }
         let addressData = [req.body.mobileNumber, req.body.address, req.body.city,req.body.provience, req.body.country];
         connection.query('INSERT INTO UberEats.Addresses VALUES (?,?,?,?,?)', addressData);
-        
-        let data = [req.body.fullName, req.body.dateOfBirth, req.body.email, req.body.mobileNumber, hash, '','', req.body.language,uType ]
-
+        let data = [req.body.fullName, req.body.dateOfBirth, req.body.email, req.body.mobileNumber, hash, req.body.uploadedFile, req.body.uploadedFile, req.body.language,uType ]
         connection.query ('INSERT INTO UberEats.Customers VALUES (?,?,?,?,?,?,?,?,?)', data, (err, results, fields)=>{
             if(results.affectedRows){
                 const token = jwt.sign({
@@ -299,17 +338,19 @@ app.post('/addCustomerDetail', (req,res)=>{
 app.post('/addRestaurantMenu', (req,res)=>{
     const tokenHeader = req.headers['x-authentication-header'];
     var decoded = jwt.verify(tokenHeader, 'my-secret-key-0001xx01212032432');
-    let data = [ '',decoded.data.mobileNumber, req.body.dishName, req.body.dishIngredients,'', req.body.dishPrice,req.body.dishDescription, req.body.dishCategory, req.body.mealType, req.body.dishType ]
+    let data = [ '',decoded.data.mobileNumber, req.body.dishName, req.body.dishIngredients, req.body.image, req.body.dishPrice,req.body.dishDescription, req.body.dishCategory, req.body.mealType, req.body.dishType ]
     connection.query ('INSERT INTO UberEats.Dishes VALUES (?,?,?,?,?,?,?,?,?,?)', data, (err, results, fields)=>{
         !err? res.json(results): res.json(err);
     } )
 })
 
 
-app.get('/basicDetail',(req,res) => {
+app.get('/basicDetail', verifyToken, (req,res) => {
     const tokenHeader = req.headers['x-authentication-header'];
     var decoded = jwt.verify(tokenHeader, 'my-secret-key-0001xx01212032432');
-    connection.query(`SELECT * FROM Restaurants where mobileNumber='${decoded.data.mobileNumber}'`,
+    const mobileNumber = req.query.restaurandId ? req.query.restaurandId : decoded.data.mobileNumber
+    console.log(mobileNumber);
+    connection.query(`SELECT * FROM Restaurants where mobileNumber='${mobileNumber}'`,
     (err, rows, fields)=>{
         if(!err){
             res.send(rows[0]);
@@ -319,11 +360,9 @@ app.get('/basicDetail',(req,res) => {
     })
 });
 
-app.get('/customerBasicDetail',(req,res) => {
+app.get('/customerBasicDetail', verifyToken, (req,res) => {
     const tokenHeader = req.headers['x-authentication-header'];
-    console.log(tokenHeader);
     var decoded = jwt.verify(tokenHeader, 'my-secret-key-0001xx01212032432');
-    console.log(decoded);
     connection.query(`SELECT Customers.fullName as fullName, Customers.dateOfBirth as dateOfBirth, 
     Customers.email as email, Customers.mobileNumber as mobileNumber, Customers.Password as password, 
     Customers.favorites as favorites, Customers.profilePicture as profilePic, Customers.language as language, 
@@ -403,7 +442,28 @@ app.post('/login', (req, res)=>{
 })
 
 
+function verifyToken(req, res, next){
+    const tokenHeader = req.headers['x-authentication-header'];
+    if(tokenHeader != 'null'){ 
+        if(jwt.verify(tokenHeader, 'my-secret-key-0001xx01212032432')){
+            next();
+        } 
+    }else{
+        res.status(401).json({msg: 'Unauthorized!'})
+    }
+}
+
+app.post("/upload", (req, res)=> {
+    upload(req, res, (err) => {
+       if(!err)
+          return res.status(200).json({fileName: fileName});
+    });
+ });
+
+ app.use('/resources',express.static(__dirname + '/public/uploads'));
 
 app.listen(3001, function () {
     console.log("Server listening on port 3001");
 });
+
+
