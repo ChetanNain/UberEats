@@ -3,7 +3,7 @@ import './CartList.css';
 import image1 from '../../images/carousel1.jpg'
 
 export default function CartList(props) {
-    const imageURL = `http://localhost:3001/resources/${props.cartItem.dishImage}`;
+    const imageURL = `http://${window.location.hostname}:3001/resources/${props.cartItem.dishImage}`;
     return (
         <div className ="small-container cart-page cardBody">
             <table>

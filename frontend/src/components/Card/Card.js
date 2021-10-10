@@ -10,7 +10,7 @@ import {Link} from 'react-router-dom';
 
 export default function Card(props){
     const [open, setOpen] = useState(false);
-    const imageURL = `http://localhost:3001/resources/${props.item.dishImage}`;
+    const imageURL = `http://${window.location.hostname}:3001/resources/${props.item.dishImage}`;
     const [message, setMessage] = useState('Dish has been added to the cart!');
      var addToCart =(flag = 0)=>{
         const headerConfig = {
@@ -21,7 +21,7 @@ export default function Card(props){
         if(flag === 2){
             setMessage('Dish has been added to the Favorite!');
         }
-        axios.get("http://localhost:3001/addToCart/" + props.item.id+"?type="+flag, headerConfig)
+        axios.get(`http://${window.location.hostname}:3001/addToCart/` + props.item.id+"?type="+flag, headerConfig)
         .then(
             res => {
                props.refreshCart()

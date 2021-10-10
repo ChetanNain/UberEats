@@ -21,7 +21,7 @@ export default function Login(props) {
             setErrorMsg('Enter a valid password');
             return false;
         }else{
-            axios.post('http://localhost:3001/login', {mobileNumber: loginData.mobileNumber.payload, password: loginData.password.payload, role: loginData.userType.payload}).then(res=>{
+            axios.post(`http://${window.location.hostname}:3001/login`, {mobileNumber: loginData.mobileNumber.payload, password: loginData.password.payload, role: loginData.userType.payload}).then(res=>{
                 localStorage.setItem('token', res.data.token);
                 localStorage.setItem('role', res.data.data.role);
                 props.history.push('/');

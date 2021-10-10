@@ -17,7 +17,7 @@ export default function Checkout(props){
                 'x-authentication-header': localStorage.getItem('token')
               }
           }
-        axios.get("http://localhost:3001/cart", headerConfig).then((res) => {
+        axios.get(`http://${window.location.hostname}:3001/cart`, headerConfig).then((res) => {
       const data = res.data.filter(e=> e.checkedOut == 0);
       setCartData(data);
     });
@@ -29,7 +29,7 @@ export default function Checkout(props){
                 'x-authentication-header': localStorage.getItem('token')
               }
           }
-          axios.get('http://localhost:3001/checkout',headerConfig ).then(res=>{
+          axios.get(`http://${window.location.hostname}:3001/checkout`,headerConfig ).then(res=>{
             setOpen(true);
             setTimeout(()=>{
                 setOpen(false);

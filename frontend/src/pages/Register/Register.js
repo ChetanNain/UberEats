@@ -34,7 +34,7 @@ export default function Register(props) {
         }
     }
     loadBasicDetails();
-    axios.get("http://localhost:3001/cart", headerConfig).then((res) => {
+    axios.get(`http://${window.location.hostname}:3001/cart`, headerConfig).then((res) => {
       setCartData(res.data);
     });
   }, []);
@@ -45,7 +45,7 @@ export default function Register(props) {
           'x-authentication-header': localStorage.getItem('token')
         }
     }
-    axios.get("http://localhost:3001/customerBasicDetail", headerConfig).then((res) => {
+    axios.get(`http://${window.location.hostname}:3001/customerBasicDetail`, headerConfig).then((res) => {
       if (res.data) {
         dispatch(stateChangeHandler({ name: "fullName", value: res.data.fullName }));
         dispatch(stateChangeHandler({ name: "mobileNumber", value: res.data.mobileNumber }));
@@ -58,7 +58,7 @@ export default function Register(props) {
         dispatch(stateChangeHandler({ name: "password", value: res.data.password }));
         dispatch(stateChangeHandler({ name: "userType", value: res.data.userType }));
         dispatch(stateChangeHandler({ name: "city", value: res.data.city }));
-        setProfilePic(`http://localhost:3001/resources/${res.data.favorites}`);
+        setProfilePic(`http://${window.location.hostname}:3001/resources/${res.data.favorites}`);
       }
     });
   }
@@ -111,7 +111,7 @@ export default function Register(props) {
     if (!valdiate()) return;
     const basicDetails = { ...registrationData, uploadedFile };
     axios
-      .post("http://localhost:3001/addCustomerDetail", basicDetails)
+      .post(`http://${window.location.hostname}:3001/addCustomerDetail`, basicDetails)
       .then((res) => {
         if(!localStorage.getItem('role')){
           localStorage.setItem('token', res.data.token);
@@ -134,7 +134,7 @@ export default function Register(props) {
   };
   const formData = new FormData();
   formData.append('myImage', e.target.files[0]);
-      axios.post("http://localhost:3001/upload",formData,config)
+      axios.post(`http://${window.location.hostname}:3001/upload`,formData,config)
           .then((res) => {
            setUploadedFile(res.data.fileName);
           }).catch((error) => {

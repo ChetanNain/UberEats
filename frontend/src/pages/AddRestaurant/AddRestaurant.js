@@ -70,7 +70,7 @@ export default class AddRestaurant extends Component {
                 'x-authentication-header': localStorage.getItem('token')
               }
           }
-        axios.get('http://localhost:3001/basicDetail', headerConfig).then(res=>{
+        axios.get(`http://${window.location.hostname}:3001/basicDetail`, headerConfig).then(res=>{
             if(res.data){
                 this.setState({restaurantName:res.data.name, restaurantLocation: res.data.city, restaurantCity: res.data.city, restaurantCountry: res.data.country, restaurantProvience: res.data.provience, restaurantPincode: res.data.pincode, restaurantDescription: res.data.description});
             }
@@ -83,7 +83,7 @@ export default class AddRestaurant extends Component {
                 'x-authentication-header': localStorage.getItem('token')
               }
           }
-        const menuItems = await axios.get(`http://localhost:3001/menuDetails`, headerConfig);
+        const menuItems = await axios.get(`http://${window.location.hostname}:3001/menuDetails`, headerConfig);
         this.setState({menuItems: menuItems.data});
     }
 
@@ -428,7 +428,7 @@ export default class AddRestaurant extends Component {
 
     removeExstingMenuItem(id){
         console.log(id);
-        axios.get(`http://localhost:3001/removeItem/${id}`)
+        axios.get(`http://${window.location.hostname}:3001/removeItem/${id}`)
         const menuItems = [...this.state.menuItems];
         const index = menuItems.findIndex((menu)=>{
             return id == menu.id
@@ -547,7 +547,7 @@ export default class AddRestaurant extends Component {
             restaurantMobileNumber: localStorage.getItem("restaurantMobileNumber"),
             image: this.state.uploadedFile
         }
-         axios.post('http://localhost:3001/addRestaurantMenu', body, headerConfig).then(response=>{ 
+         axios.post(`http://${window.location.hostname}:3001/addRestaurantMenu`, body, headerConfig).then(response=>{ 
            this.loadMenuItems();
             this.setState({openConfirmation: true, message: 'Dish has been added!',
             selectedDishId: '',
@@ -575,7 +575,7 @@ export default class AddRestaurant extends Component {
         };
         const formData = new FormData();
         formData.append('myImage', e.target.files[0]);
-        axios.post("http://localhost:3001/upload",formData,config)
+        axios.post(`http://${window.location.hostname}:3001/upload`,formData,config)
             .then((res) => {
                this.setState({uploadedFile: res.data.fileName});
             }).catch((error) => {
@@ -601,7 +601,7 @@ export default class AddRestaurant extends Component {
                 'x-authentication-header': localStorage.getItem('token')
               }
           }
-         axios.post('http://localhost:3001/addRestaurantBasicDetail', basicDetails, headerConfig).then(res=>{
+         axios.post(`http://${window.location.hostname}:3001/addRestaurantBasicDetail`, basicDetails, headerConfig).then(res=>{
             this.setState({openConfirmation: true, message: 'Basic details has been saved!'})
             setTimeout(() => {
                this.setState({openConfirmation: false, message: ''})

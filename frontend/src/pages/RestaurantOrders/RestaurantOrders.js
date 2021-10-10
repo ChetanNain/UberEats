@@ -7,7 +7,7 @@ export default function RestaurantOrders() {
                             orderStatus : e.target.value , 
                             orderID : id
                         }
-            await axios.post('http://localhost:3001/updateOrderStatus',data)
+            await axios.post(`http://${window.location.hostname}:3001/updateOrderStatus`,data)
             alert("Status Updated");
     }
     const [orders, setOrders] = React.useState([]);
@@ -18,7 +18,7 @@ export default function RestaurantOrders() {
                 'x-authentication-header': localStorage.getItem('token')
               }
           }
-        axios.get('http://localhost:3001/orders', headerConfig).then(res => {
+        axios.get(`http://${window.location.hostname}:3001/orders`, headerConfig).then(res => {
         setOrders(res.data);
     })
   }, [])

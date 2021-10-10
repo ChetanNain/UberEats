@@ -130,7 +130,7 @@ export default function CustomDrawer(props) {
   }, []);
 
   function loadCartData(){
-    axios.get("http://localhost:3001/cart", headerConfig).then((res) => {
+    axios.get(`http://${window.location.hostname}:3001/cart`, headerConfig).then((res) => {
       const data = res.data.filter(e=> e.checkedOut == 0);
       setCartData(data);
     });
@@ -138,7 +138,7 @@ export default function CustomDrawer(props) {
 
 
   function loadDishData(){
-    axios.post('http://localhost:3001/dishes', filters, headerConfig).then(res=>{
+    axios.post(`http://${window.location.hostname}:3001/dishes`, filters, headerConfig).then(res=>{
       dispatch(updateDishes(res.data));
     })
   }
@@ -149,7 +149,7 @@ export default function CustomDrawer(props) {
 
   function removeItem(id) {
     const data = { itemId: id };
-    axios.post("http://localhost:3001/removeFromCart", data).then((res) => {
+    axios.post(`http://${window.location.hostname}:3001/removeFromCart`, data).then((res) => {
       //setCartData(res.data);
       let arr = [...cartData];
       const index = arr.findIndex((ele) => {
@@ -176,7 +176,7 @@ export default function CustomDrawer(props) {
           'x-authentication-header': localStorage.getItem('token')
         }
     }
-    axios.get('http://localhost:3001/checkout',headerConfig ).then(res=>{
+    axios.get(`http://${window.location.hostname}:3001/checkout`,headerConfig ).then(res=>{
       toggleCart();
     }) */
   }
@@ -187,7 +187,7 @@ export default function CustomDrawer(props) {
           'x-authentication-header': localStorage.getItem('token')
         }
     }
-    axios.get('http://localhost:3001/logout', headerConfig).then(res=>{
+    axios.get(`http://${window.location.hostname}:3001/logout`, headerConfig).then(res=>{
       localStorage.setItem("token", res.data.token);
       localStorage.removeItem("role");
       localStorage.removeItem("token");
