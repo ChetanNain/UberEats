@@ -77,7 +77,7 @@ app.post('/restaurants/addDishes',(req,res,next)=>{
 
 app.post('/dishes', function (req, res) {
     const filters = req.body;
-    let query = 'Select dish.dishId as id, dish.dishImage, dish.dishType as dishType, res.mobileNumber as mobileNumber, dish.dishName, dish.dishCategory, dish.dishPrice as price, dish.dishTag as dishTag ,res.name from Restaurants as res Inner Join Dishes  as dish ON res.mobileNumber=dish.restaurantMobileNumber where 1 = 1';
+    let query = 'Select dish.dishId as id, dish.dishImage, dish.dishType as dishType, res.mobileNumber as mobileNumber, dish.dishName, dish.dishCategory, dish.dishPrice as price, dish.dishTag as dishTag, res.name, res.city from Restaurants as res Inner Join Dishes  as dish ON res.mobileNumber=dish.restaurantMobileNumber where 1 = 1';
     if(filters.mealType?.length){
         query +=` AND dishTag in ("${filters.mealType.join('", "')}") `;
     }
@@ -91,7 +91,10 @@ app.post('/dishes', function (req, res) {
     (err, rows, fields)=>{
         if(!err){
             if(filters.searchQuery){
-                rows = rows.filter(row => [row.dishName, row.dishTag, row.dishType, row.name, row.dishCategory].includes(filters.searchQuery));
+                rows = rows.filter(row => {
+                    const searchArr = [row.dishName, row.city, row.dishTag, row.dishType, row.name, row.dishCategory];
+                    return searchArr.includes(filters.searchQuery)
+                });
             }
             res.send(rows);
         }else{
@@ -175,10 +178,12 @@ app.get('/addToCart/:dishId', (req, res) =>{
 app.get('/checkout', (req,res) =>{
     const tokenHeader = req.headers['x-authentication-header'];
     var decoded = jwt.verify(tokenHeader, 'my-secret-key-0001xx01212032432');
-    connection.query("SELECT * FROM cart where checkedOut = 0 and customerMobileNumber=" + decoded.data.mobileNumber,
+    connection.query("SELECT * FROM cart, Dishes where cart.dishId = Dishes.dishId and checkedOut = 0 and customerMobileNumber=" + decoded.data.mobileNumber,
     (err, rows, fields)=>{
         rows.map(row =>{
-            connection.query("INSERT INTO Orders Values (?,?,?,?,?)",['',row.customerMobileNumber, row.restaurantMobileNumber, row.dishId,0]);
+            connection.query("INSERT INTO Orders Values (?,?,?,?,?,?, ?)", ['',row.customerMobileNumber, row.restaurantMobileNumber, row.dishId, 0, row.dishName, row.dishPrice], (err)=>{
+                console.log(err);
+            });
             connection.query("Update cart set checkedOut=1 where dishId = " + row.dishId + " AND  customerMobileNumber = "+ decoded.data.mobileNumber);
         })        
     })
@@ -292,8 +297,8 @@ app.post('/addRestaurantBasicDetail', (req,res)=>{
     const tokenHeader = req.headers['x-authentication-header'];
     var decoded = jwt.verify(tokenHeader, 'my-secret-key-0001xx01212032432');
    
-    let data = [decoded.data.mobileNumber, req.body.restaurantName, req.body.restaurantAddress, req.body.restaurantCity, req.body.restaurantProvience, req.body.restaurantCountry, req.body.restaurantPincode,null, req.body.restaurantDescription ]
-    connection.query ('INSERT INTO UberEats.Restaurants VALUES (?,?,?,?,?,?,?,?,?)', data, (err, results, fields)=>{
+    let data = [decoded.data.mobileNumber, req.body.restaurantName, req.body.restaurantAddress, req.body.restaurantCity, req.body.restaurantProvience, req.body.restaurantCountry, req.body.restaurantPincode,null, req.body.restaurantDescription, req.body.restaurantType ]
+    connection.query ('INSERT INTO UberEats.Restaurants VALUES (?,?,?,?,?,?,?,?,?, ?)', data, (err, results, fields)=>{
         !err? res.send(200):res.json(err);
     } )
 })
@@ -305,10 +310,28 @@ app.post('/addCustomerDetail', (req,res)=>{
             uType=1;
         }
         let addressData = [req.body.mobileNumber, req.body.address, req.body.city,req.body.provience, req.body.country];
-        connection.query('INSERT INTO UberEats.Addresses VALUES (?,?,?,?,?)', addressData);
+        connection.query(`SELECT * from Customers where mobileNumber = '${req.body.mobileNumber}'`, (err, result)=>{
+            if(result.length > 0){
+                console.log("Inside if");
+                let url1=`UPDATE Addresses set address= '${req.body.address}',city='${req.body.city}', state='${req.body.provience}', country = '${req.body.country}' where mobileNumber='${req.body.mobileNumber}'`;
+                let url2=`Update Customers set fullName='${req.body.fullName}', dateOfBirth='${req.body.dateOfBirth}', email='${req.body.email}', password='${hash}' where mobileNumber='${req.body.mobileNumber}'`;
+                console.log(url1);
+                console.log(url2);
+                connection.query(url1, (err1, res)=>{
+                    console.log(res, err1)
+                });
+                console.log("Inside Second if");
+                connection.query(url2, (err2, res)=>{
+                    console.log(err2)
+                });
+                res.send(200);
+            }else {
+                console.log("Inside else");
+            connection.query('INSERT INTO UberEats.Addresses VALUES (?,?,?,?,?)', addressData);
         let data = [req.body.fullName, req.body.dateOfBirth, req.body.email, req.body.mobileNumber, hash, req.body.uploadedFile, req.body.uploadedFile, req.body.language,uType ]
         connection.query ('INSERT INTO UberEats.Customers VALUES (?,?,?,?,?,?,?,?,?)', data, (err, results, fields)=>{
             if(results.affectedRows){
+                console.log("Inside third if");
                 const token = jwt.sign({
                     data: {
                         fullName: req.body.fullName,
@@ -328,9 +351,12 @@ app.post('/addCustomerDetail', (req,res)=>{
                     }
                 }) 
             }else{
+                console.log("Inside second else");
                 res.status(400).json({msg: 'Unable to register'})
             }
         })
+            }
+        });
     })
 })
 
@@ -339,9 +365,16 @@ app.post('/addRestaurantMenu', (req,res)=>{
     const tokenHeader = req.headers['x-authentication-header'];
     var decoded = jwt.verify(tokenHeader, 'my-secret-key-0001xx01212032432');
     let data = [ '',decoded.data.mobileNumber, req.body.dishName, req.body.dishIngredients, req.body.image, req.body.dishPrice,req.body.dishDescription, req.body.dishCategory, req.body.mealType, req.body.dishType ]
-    connection.query ('INSERT INTO UberEats.Dishes VALUES (?,?,?,?,?,?,?,?,?,?)', data, (err, results, fields)=>{
-        !err? res.json(results): res.json(err);
-    } )
+    if(req.body.dishId){
+        connection.query (`update UberEats.Dishes set dishName='${req.body.dishName}', dishPrice='${req.body.dishPrice}', mainIngredients='${req.body.dishIngredients}', dishCategory='${req.body.dishCategory}', dishType= '${req.body.dishType}', dishTag='${req.body.mealType}' where dishID=${req.body.dishId}`, data, (err, results, fields)=>{
+            !err? res.json(results): res.json(err);
+        } )
+    }else{
+        connection.query ('INSERT INTO UberEats.Dishes VALUES (?,?,?,?,?,?,?,?,?,?)', data, (err, results, fields)=>{
+            !err? res.json(results): res.json(err);
+        } )
+    }
+    
 })
 
 
@@ -409,7 +442,7 @@ app.post('/login', (req, res)=>{
     const mobileNumber = req.body.mobileNumber;
     const password = req.body.password;
     
-    connection.query (`select * from Customers where mobileNumber = '${mobileNumber}'`, (err, results, fields)=>{
+    connection.query (`select * from Customers where email = '${mobileNumber}'`, (err, results, fields)=>{
         if(results.length > 0){
             bcrypt.compare(password, results[0].password, function(err, result) {
                 if(!err){

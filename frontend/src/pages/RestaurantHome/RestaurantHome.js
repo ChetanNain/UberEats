@@ -77,44 +77,21 @@ export default function RestaurantHome(props) {
 return(
     <div>
     <Carousel style={{height: '300px'}}>
-  <Carousel.Item style={{height: '300px'}}>
-    <img
-      className="d-block w-100"
-      src={image1}
-      alt="First slide"
-      style={{height: '300px'}}
-    />
-    <Carousel.Caption style={{background: 'black', opacity: '0.8'}}>
-      <h3>Welcome to the cafe!</h3>
-      <p>{restaurant.description}</p>
-    </Carousel.Caption>
-  </Carousel.Item>
-  <Carousel.Item style={{height: '300px'}}>
-    <img
-      className="d-block w-100"
-      src={image1}
-      alt="Second slide"
-      style={{height: '300px'}}
-    />
-
-    <Carousel.Caption style={{background: 'black', opacity: '0.8'}}>
-      <h3>Welcome to the cafe!</h3>
-      <p>{restaurant.description}</p>
-    </Carousel.Caption>
-  </Carousel.Item>
-  <Carousel.Item style={{height: '300px'}}>
-    <img
-      className="d-block w-100"
-      src={image1}
-      alt="Third slide"
-      style={{height: '300px'}}
-    />
-
-    <Carousel.Caption style={{background: 'black', opacity: '0.8'}}>
-      <h3>Welcome to the cafe!</h3>
-      <p>{restaurant.description}</p>
-    </Carousel.Caption>
-  </Carousel.Item>
+      {data.map(carousal=>{
+          const dishImage = `http://localhost:3001/resources/${carousal.dishImage}`;
+            return <Carousel.Item style={{height: '300px'}}>
+            <img
+              className="d-block w-100"
+              src={dishImage}
+              alt="First slide"
+              style={{height: '300px'}}
+            />
+            <Carousel.Caption style={{background: 'black', opacity: '0.8'}}>
+              <h3>Welcome to the cafe!</h3>
+              <p>{restaurant.description}</p>
+            </Carousel.Caption>
+      </Carousel.Item>
+      })}
 </Carousel>
 
   <div className='d-md-flex justify-content-center' style={{background: 'white'}}>

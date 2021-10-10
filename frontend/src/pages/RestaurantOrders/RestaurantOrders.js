@@ -30,7 +30,8 @@ export default function RestaurantOrders() {
                             <span>{order.orderID}</span> 
                             <span>{order.customerMobile}</span>
                             <span>{order.restaurantMobile}</span>
-                            <span>{order.dishID}</span>
+                            <span>{order.dishName}</span>
+                            <span>{order.dishPrice}</span>
                             <span class="py-3">{order.orderStatus == 0 ? 'Recieved' : order.orderStatus == 1 ? 'Preparing Now': order.orderStatus == 2 ? 'Delivered' :order.orderStatus == 3 ?  'Rejected' : ''}</span>
                             <div class="w-30">
                                 {localStorage.getItem("role") ==1 ? <select onChange={(event)=>UpdateOrderStatus(order.orderID, event)}>

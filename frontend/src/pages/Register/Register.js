@@ -13,8 +13,8 @@ export default function Register(props) {
   const [selectedCountry, setSelectedCountry] = React.useState("US");
   const [open, setOpen] = useState(false);
   const [uploadedFile, setUploadedFile] = React.useState('');
-  const [data, setData] = React.useState([{dishName: 'Burger', price: '4'}, {dishName: 'Burger', price: '4'}, {dishName: 'Burger', price: '4'}]);
   const [profilePic, setProfilePic] = React.useState('');
+  const [cartData, setCartData] = useState([]);
   const [usProvience, setUsProvience] = React.useState(
     useSelector((state) => state.masterData.usProvience)
   );
@@ -35,7 +35,7 @@ export default function Register(props) {
     }
     loadBasicDetails();
     axios.get("http://localhost:3001/cart", headerConfig).then((res) => {
-      setData(res.data);
+      setCartData(res.data);
     });
   }, []);
 
@@ -85,7 +85,7 @@ export default function Register(props) {
     } else if (registrationData.confirmPassword != registrationData.password) {
       setErrorMessage("Passwords does not match");
       return false;
-    } else if (
+    } else if ( !localStorage.getItem('role') &&
       ["Customer", "Restaurant"].findIndex(
         (role) => role == registrationData.userType
       ) == -1
@@ -113,9 +113,11 @@ export default function Register(props) {
     axios
       .post("http://localhost:3001/addCustomerDetail", basicDetails)
       .then((res) => {
-        localStorage.setItem('token', res.data.token);
-        localStorage.setItem('role', res.data.data.role);
-        props.history.push('/');
+        if(!localStorage.getItem('role')){
+          localStorage.setItem('token', res.data.token);
+          localStorage.setItem('role', res.data.data.role);
+          props.history.push('/');
+        }
       });
   }
 
@@ -184,7 +186,7 @@ export default function Register(props) {
           type="password"
           placeholder="Password"
           name="password"
-          value = {registrationData.password}
+          //value = {registrationData.password}
           onChange={(e) =>
             dispatch(
               stateChangeHandler({ name: "password", value: e.target.value })
@@ -226,6 +228,7 @@ export default function Register(props) {
           placeholder="email"
           name="email"
           value = {registrationData.email}
+          disabled={localStorage.getItem("role") ? true : false}
           onChange={(e) =>
             dispatch(
               stateChangeHandler({ name: "email", value: e.target.value })
@@ -348,12 +351,12 @@ export default function Register(props) {
     <div style={{display: localStorage.getItem('role') ? 'block' : 'none'}}>
     <p>Favorites</p>
       <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr'}}>
-        {data.map(item=>{
+        {cartData.map(item=>{
             return item.checkedOut === 2 ? <Card item={item}/> : ''
         })}
     </div>
     </div>
-    <PopUp open={open} message={"Account created!"}/>
+    <PopUp open={open} message={"Details Saved."}/>
     </div>
   );
 }

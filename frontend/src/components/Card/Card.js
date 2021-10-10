@@ -23,6 +23,7 @@ export default function Card(props){
         axios.get("http://localhost:3001/addToCart/" + props.item.id+"?type="+flag, headerConfig)
         .then(
             res => {
+               props.refreshCart()
                 setOpen(true);
                 setTimeout(()=>{
                     setOpen(false);

@@ -29,19 +29,39 @@ export default class AddRestaurant extends Component {
             dishDescription:'',
             uploadedFile: '',
             openConfirmation: false,
-            message: ''
+            message: '',
+            restaurantType:'Delivery',
+            selectedDishId: ''
         }
         this.toggleModal = this.toggleModal.bind(this);
         this.validateBasicFromDetail = this.validateBasicFromDetail.bind(this);
     }
 
+    
     toggleModal(){
+        if(this.state.open){
+            this.setState({
+            selectedDishId: '',
+            dishName: '',
+            dishDescription: '',
+            dishPrice: '',
+            dishIngredients: '',
+            mealType: '',
+            dishCategory: '',
+            dishType: ''
+            });
+        }
         this.setState({open: !this.state.open})
+       
     }
 
     componentDidMount(){
         this.loadBasicDetails();
         this.loadMenuItems();
+    }
+
+    handleRestaurantType(e){
+        this.setState({restaurantType: e.target.value}) 
     }
 
      loadBasicDetails(){
@@ -417,16 +437,31 @@ export default class AddRestaurant extends Component {
         this.setState({menuItems: menuItems})
     }
 
+    updateExstingMenuItem(id){
+        const selectedRecord = this.state.menuItems.filter(item=> item.dishId == id);
+        this.setState({open: true, 
+            dishName: selectedRecord[0]?.dishName, 
+            dishPrice: selectedRecord[0]?.dishPrice, 
+            dishIngredients: selectedRecord[0].mainIngredients,
+            dishCategory: selectedRecord[0].dishCategory,
+            dishTag: selectedRecord[0].dishTag,
+            dishType: selectedRecord[0].dishType,
+            dishDescription: selectedRecord[0].description,
+            selectedDishId: selectedRecord[0].dishId
+        })
+        
+    }
+
     generateMenuList(data){
-        console.log(data);
         return <div style={{borderBottom: '1px solid black', padding: '10px'}}>
         <div style={{justifyContent: 'space-between', display: 'flex', alignItems: 'center' }}>
             <span>{data.dishName}</span> 
             <span>{data.dishPrice}</span>
-            <span>{data.mainIngredients}</span>
-            <span>{data.dishTag}</span>
+            <span>{data.mainIngredients || data.dishIngredients}</span>
+            <span>{data.dishTag || data.mealType}</span>
             <span>{data.dishType}</span>
             <span>{data.dishCategory}</span>
+            <a class="link" onClick={()=>this.updateExstingMenuItem(data.dishId)}>Update</a>
             <a class="link" onClick={()=>this.removeExstingMenuItem(data.dishId)}>Remove</a>
         </div>
     </div>
@@ -501,6 +536,7 @@ export default class AddRestaurant extends Component {
           }
         if(this.validateBasicFromDetail() == false || this.validateMenuForm() == false) return;
         const body = {
+            dishId: this.state.selectedDishId,
             dishName: this.state.dishName,
             dishDescription: this.state.dishDescription,
             dishPrice: this.state.dishPrice,
@@ -512,10 +548,17 @@ export default class AddRestaurant extends Component {
             image: this.state.uploadedFile
         }
          axios.post('http://localhost:3001/addRestaurantMenu', body, headerConfig).then(response=>{ 
-            let menuItems = [...this.state.menuItems];
-            menuItems.push(body);
-            this.setState({menuItems});
-            this.setState({openConfirmation: true, message: 'Dish has been added!'})
+           this.loadMenuItems();
+            this.setState({openConfirmation: true, message: 'Dish has been added!',
+            selectedDishId: '',
+            dishName: '',
+            dishDescription: '',
+            dishPrice: '',
+            dishIngredients: '',
+            mealType: '',
+            dishCategory: '',
+            dishType: ''
+        })
             setTimeout(() => {
                this.setState({openConfirmation: false, message: ''})
             }, 2000);
@@ -549,7 +592,8 @@ export default class AddRestaurant extends Component {
                 restaurantProvience: this.state.restaurantProvience || 'US',
                 restaurantCountry: this.state.restaurantCountry || 'AL',
                 restaurantPincode: this.state.restaurantPincode,
-                restaurantDescription: this.state.restaurantDescription
+                restaurantDescription: this.state.restaurantDescription,
+                restaurantType: this.state.restaurantType || 'Delivery'
         }
 
         const headerConfig = {
@@ -625,6 +669,17 @@ export default class AddRestaurant extends Component {
                 onChange={this.restaurantDescriptionHandler.bind(this)}
               />
             </div>
+            <div class="d-flex justify-content-around">
+            <select
+                placeholder="Restaurant Type"
+                value={this.state.restaurantType}
+                onChange={this.handleRestaurantType.bind(this)}
+              >
+                <option value="Delivery">Delivery</option>
+                <option value="Pickup">Pickup</option>
+                <option value="Delivery and Pickup">Delivery and Pickup</option>
+              </select>
+            </div>
 
             <div class="d-flex justify-content-evenly">
                     <button class="btn btn-success" onClick={this.saveRestaurantData.bind(this)}>Save Basic Details</button>
@@ -652,6 +707,7 @@ export default class AddRestaurant extends Component {
                   <input
                     type="text"
                     placeholder="Dish name"
+                    value={this.state.dishName}
                     onChange={
                       this.handleDishName.bind(this)
                     }
@@ -659,6 +715,7 @@ export default class AddRestaurant extends Component {
                   <input
                     type="number"
                     placeholder="Dish Price"
+                    value={this.state.dishPrice}
                     onChange={
                       this.handleDishPrice.bind(this)
                     }
@@ -668,6 +725,7 @@ export default class AddRestaurant extends Component {
                   <input
                     type="text"
                     placeholder="Ingredients (Use comma to seperate)"
+                    value={this.state.dishIngredients}
                     onChange={
                       this.handleDishIngredients.bind(this)
                     }
@@ -683,6 +741,7 @@ export default class AddRestaurant extends Component {
 
                 <div class="d-flex justify-content-between">
                   <select
+                    value={this.state.mealType}
                     onChange={
                       this.handleMealType.bind(this)
                     }
@@ -694,6 +753,7 @@ export default class AddRestaurant extends Component {
                   </select>
 
                   <select
+                    value={this.state.dishCategory}
                     onChange={
                       this.handleDishCategory.bind(this)
                     }
@@ -707,6 +767,7 @@ export default class AddRestaurant extends Component {
 
                 <div class="d-flex justify-content-between">
                   <select
+                  value={this.state.dishType}
                     onChange={
                       this.handleDishType.bind(this)
                     }
@@ -722,6 +783,7 @@ export default class AddRestaurant extends Component {
                     row="5"
                     cols="80"
                     placeholder="Dish Description"
+                    value={this.state.dishDescription}
                     onChange={
                       this.handleDishDescription.bind(this)
                     }

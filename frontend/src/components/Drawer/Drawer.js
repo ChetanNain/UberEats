@@ -125,12 +125,17 @@ export default function CustomDrawer(props) {
   }
 
   useEffect(() => {
+   loadCartData();
+    loadDishData();
+  }, []);
+
+  function loadCartData(){
     axios.get("http://localhost:3001/cart", headerConfig).then((res) => {
       const data = res.data.filter(e=> e.checkedOut == 0);
       setCartData(data);
     });
-    loadDishData();
-  }, []);
+  }
+
 
   function loadDishData(){
     axios.post('http://localhost:3001/dishes', filters, headerConfig).then(res=>{
@@ -338,7 +343,7 @@ export default function CustomDrawer(props) {
       >
         <div className={classes.drawerHeader} />
           <Switch>
-            <Route exact path='/' component={Home} />
+            <Route exact path='/' component={() => <Home refreshCart={loadCartData}/>}/>
             <Route exact path='/login' component={Login} />
             <Route exact path='/add-restaurant' component={AddRestaurant} />
             <Route exact path='/orders' component={RestaurantOrders} />
