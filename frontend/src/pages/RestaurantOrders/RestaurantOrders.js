@@ -23,13 +23,23 @@ export default function RestaurantOrders() {
     })
   }, [])
 
-    return <div >
+    return <div>
+             <div class="orderList" style={{justifyContent: 'space-between', display: 'flex', alignItems: 'center' }}>
+                            <h6>Id</h6> 
+                            {localStorage.getItem("role") == 1 ? <h6>Customer M No.</h6> : ''}
+                            {localStorage.getItem("role") == 0 ? <h6>Restaurant M No.</h6> : ''}
+                            <h6>Dish Name</h6>
+                            <h6>Price</h6>
+                            <h6>Status</h6>
+                            {localStorage.getItem("role") ==1 ? <h6>Update</h6>: ''}
+            </div>
+            <div style={{height: '80vh', overflow: 'scroll'}}>
             {orders.map(order => {
                 return <div class="orderList">
                         <div style={{justifyContent: 'space-between', display: 'flex', alignItems: 'center' }}>
                             <span>{order.orderID}</span> 
-                            <span>{order.customerMobile}</span>
-                            <span>{order.restaurantMobile}</span>
+                            {localStorage.getItem("role") == 1 ? <span>{order.customerMobile}</span> : ''}
+                            {localStorage.getItem("role") == 0 ? <span>{order.restaurantMobile}</span> : ''}
                             <span>{order.dishName}</span>
                             <span>{order.dishPrice}</span>
                             <span class="py-3">{order.orderStatus == 0 ? 'Recieved' : order.orderStatus == 1 ? 'Preparing Now': order.orderStatus == 2 ? 'Delivered' :order.orderStatus == 3 ?  'Rejected' : ''}</span>
@@ -41,8 +51,11 @@ export default function RestaurantOrders() {
                                     <option value="3">Reject</option>
                                 </select> : null}
                             </div>
+                            
                         </div>
                     </div>
-            })}      
+                   
+            })}   
+             </div>   
         </div>
 }

@@ -16,7 +16,7 @@ export default class SimpleSlider extends React.Component {
 
     settings = {
         dots: true,
-        infinite: true,
+        infinite: false,
         speed: 500,
         slidesToShow: 3,
         responsive: [
@@ -52,7 +52,7 @@ export default class SimpleSlider extends React.Component {
       <p style={{fontSize: '16px', fontWeight: 600}}>{this.props.slickHeading}</p>
         <Slider {...this.settings}>
           {this.props.data.map((dish) =>
-              <Card item={dish} navigate={this.props.navigate} refreshCart={this.props.refreshCart} />
+              <Card item={dish} refreshCart={this.props.refreshCart} />
           )}
         </Slider>
       </div>

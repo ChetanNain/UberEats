@@ -22,9 +22,10 @@ export default function RestaurantHome(props) {
   const [restaurantProvience, setRestaurantProvience] = React.useState();
   const [restaurantPincode, setRestaurantPincode] = React.useState();
   const [mobileNumber, setRestaurantMobileNumber] = React.useState();
+  
+  const urlParams = new URLSearchParams(window.location.search);
+  const resId = urlParams.get('resId');
 
-  const search = props.location.search;
-  const resId = new URLSearchParams(search).get('resId');
   React.useEffect(() => {
     const headerConfig = {
       headers: {
@@ -88,13 +89,13 @@ return(
             />
             <Carousel.Caption style={{background: 'black', opacity: '0.8'}}>
               <h3>Welcome to the cafe!</h3>
-              <p>{restaurant.description}</p>
+              <p>{restaurant?.description}</p>
             </Carousel.Caption>
       </Carousel.Item>
       })}
 </Carousel>
 
-  <div className='d-md-flex justify-content-center' style={{background: 'white'}}>
+  <div className='d-md-flex justify-content-center' style={{background: 'white', display: restaurant?.description ? 'none' : 'block'}} >
     <div class="addressBox" style={{padding: '3%'}}>
       <RestaurantIcon style={{width: '50px', height: '50px'}}/><span>{restaurantName}</span>
     </div>
@@ -109,20 +110,20 @@ return(
     </div>
   </div>
 
-  <div onClick={()=>props.history.push('/add-restaurant')} class="addressBox" style={{padding: '20px', width: '350px', alignItems: 'center', margin: 'auto', display: restaurant.description ? 'none' : 'block'}}>
+  <div onClick={()=>props.history.push('/add-restaurant')} class="addressBox" style={{padding: '20px', width: '350px', alignItems: 'center', margin: 'auto', display: restaurant?.description ? 'none' : 'block'}}>
     <center><p style={{margin:'auto'}}>Click! Add your restaurant here.</p></center>
-    </div>
+  </div>
   
  
-<center><p>{restaurant.description}</p></center>
+<center><p>{restaurant?.description}</p></center>
   {window.screen.width <= 576 ? <div style={{display: 'grid', gridTemplateColumns: '1fr'}}>
     {data.map(item=>{
-        return <Card item={item}/>
+        return <Card item={item} refreshCart={props.refreshCart}/>
     })}
     </div>: 
     <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr'}}>
     {data.map(item=>{
-        return <Card item={item}/>
+        return <Card item={item}  refreshCart={props.refreshCart}/>
     })}
     </div>
     }

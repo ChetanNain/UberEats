@@ -48,15 +48,26 @@ app.use(cors())
 //Get a restaurant
 app.get('/restaurants',(req,res)=>{
     const tokenHeader = req.headers['x-authentication-header'];
-    var decoded = jwt.verify(tokenHeader, 'my-secret-key-0001xx01212032432');
-    const restaurantMobileNumber = req.query?.restaurandId ? req.query?.restaurandId : decoded.data.mobileNumber;
-    connection.query('SELECT * FROM UberEats.Restaurants WHERE mobileNumber = ?', restaurantMobileNumber, (err, rows, fields)=>{
-        if(!err){
-           res.send(rows);
-        }else{
-            console.log(err);
-        }
-    })
+    if(tokenHeader != 'null'){
+        var decoded = jwt.verify(tokenHeader, 'my-secret-key-0001xx01212032432');
+        const restaurantMobileNumber = req.query?.restaurandId ? req.query?.restaurandId : decoded.data.mobileNumber;
+        connection.query('SELECT * FROM UberEats.Restaurants WHERE mobileNumber = ?', restaurantMobileNumber, (err, rows, fields)=>{
+            if(!err){
+               res.send(rows);
+            }else{
+                console.log(err);
+            }
+        })
+    }else{
+        connection.query('SELECT * FROM UberEats.Restaurants WHERE mobileNumber = ?', req.query?.restaurandId, (err, rows, fields)=>{
+            if(!err){
+               res.send(rows);
+            }else{
+                console.log(err);
+            }
+        })
+    }
+   
 })
 
 //Update phone number.
@@ -77,7 +88,7 @@ app.post('/restaurants/addDishes',(req,res,next)=>{
 
 app.post('/dishes', function (req, res) {
     const filters = req.body;
-    let query = 'Select dish.dishId as id, dish.dishImage, dish.dishType as dishType, res.mobileNumber as mobileNumber, dish.dishName, dish.dishCategory, dish.dishPrice as price, dish.dishTag as dishTag, res.name, res.city from Restaurants as res Inner Join Dishes  as dish ON res.mobileNumber=dish.restaurantMobileNumber where 1 = 1';
+    let query = 'Select dish.dishId as id, dish.dishImage, dish.dishType as dishType, res.mobileNumber as mobileNumber, dish.dishName, dish.dishCategory, dish.dishPrice as price, dish.dishTag as dishTag, res.name, res.city, res.restaurantType from Restaurants as res Inner Join Dishes  as dish ON res.mobileNumber=dish.restaurantMobileNumber where 1 = 1';
     if(filters.mealType?.length){
         query +=` AND dishTag in ("${filters.mealType.join('", "')}") `;
     }
@@ -86,6 +97,8 @@ app.post('/dishes', function (req, res) {
     }
     if(filters.dishCategory?.length){
         query +=` AND dishCategory in ("${filters.dishCategory.join('", "')}") `;
+    }if(filters.restaurantType?.length){
+        query +=` AND res.restaurantType in ("${filters.restaurantType.join('", "')}") `;
     }
     connection.query(query, 
     (err, rows, fields)=>{
@@ -105,15 +118,26 @@ app.post('/dishes', function (req, res) {
 //Dishes by restaurant
 app.get('/restaurantDishes', function (req, res) {
     const tokenHeader = req.headers['x-authentication-header'];
-    var decoded = jwt.verify(tokenHeader, 'my-secret-key-0001xx01212032432');
-    const restaurantMobileNumber = req.query.restaurandId ? req.query.restaurandId : decoded.data.mobileNumber; 
-    connection.query(`Select dish.dishID as id, dish.dishImage, res.mobileNumber as restaurantMobileNumber, dish.dishType as dishType, dish.dishName, dish.dishPrice as price, dish.dishTag as dishTag, res.name from Restaurants as res Inner Join Dishes  as dish ON res.mobileNumber=dish.restaurantMobileNumber where dish.restaurantMobileNumber = '${restaurantMobileNumber}'`, (err, rows, fields)=>{
-        if(!err){
-            res.send(rows)
-        }else{
-            console.log(err);
-        }
-    })
+    if(tokenHeader != 'null'){
+        var decoded = jwt.verify(tokenHeader, 'my-secret-key-0001xx01212032432');
+        const restaurantMobileNumber = req.query.restaurandId ? req.query.restaurandId : decoded.data.mobileNumber; 
+        connection.query(`Select dish.dishID as id, dish.dishImage, res.mobileNumber as restaurantMobileNumber, dish.dishType as dishType, dish.dishName, dish.dishPrice as price, dish.dishTag as dishTag, res.name from Restaurants as res Inner Join Dishes  as dish ON res.mobileNumber=dish.restaurantMobileNumber where dish.restaurantMobileNumber = '${restaurantMobileNumber}'`, (err, rows, fields)=>{
+            if(!err){
+                res.send(rows)
+            }else{
+                console.log(err);
+            }
+        })
+    }else{
+        connection.query(`Select dish.dishID as id, dish.dishImage, res.mobileNumber as restaurantMobileNumber, dish.dishType as dishType, dish.dishName, dish.dishPrice as price, dish.dishTag as dishTag, res.name from Restaurants as res Inner Join Dishes  as dish ON res.mobileNumber=dish.restaurantMobileNumber where dish.restaurantMobileNumber = '${req.query?.restaurandId}'`, (err, rows, fields)=>{
+            if(!err){
+                res.send(rows)
+            }else{
+                console.log(err);
+            }
+        })
+    }
+    
 });
 
 //list of customers
@@ -209,7 +233,7 @@ app.get('/cart', verifyToken, function(req,res){
         const tokenHeader = req.headers['x-authentication-header'];
         var decoded = jwt.verify(tokenHeader, 'my-secret-key-0001xx01212032432');
         console.log(decoded);
-        connection.query(`select dish.dishID as id, dish.dishImage, res.name, res.mobileNumber as restaurantMobileNumber , dish.dishName, dish.dishPrice as price, cart.checkedOut from cart, Restaurants as res, Dishes as dish where cart.dishId = dish.dishId and cart.restaurantMobileNumber = res.mobileNumber and cart.customerMobileNumber=${decoded.data.mobileNumber};`,
+        connection.query(`select dish.dishID as id, dish.dishImage, res.name, res.mobileNumber, dish.dishName, dish.dishPrice as price, cart.checkedOut from cart, Restaurants as res, Dishes as dish where cart.dishId = dish.dishId and cart.restaurantMobileNumber = res.mobileNumber and cart.customerMobileNumber=${decoded.data.mobileNumber};`,
         
         (err, rows, fields)=>{
             console.log(rows);
@@ -365,6 +389,7 @@ app.post('/addRestaurantMenu', (req,res)=>{
     const tokenHeader = req.headers['x-authentication-header'];
     var decoded = jwt.verify(tokenHeader, 'my-secret-key-0001xx01212032432');
     let data = [ '',decoded.data.mobileNumber, req.body.dishName, req.body.dishIngredients, req.body.image, req.body.dishPrice,req.body.dishDescription, req.body.dishCategory, req.body.mealType, req.body.dishType ]
+    console.log(data);
     if(req.body.dishId){
         connection.query (`update UberEats.Dishes set dishName='${req.body.dishName}', dishPrice='${req.body.dishPrice}', mainIngredients='${req.body.dishIngredients}', dishCategory='${req.body.dishCategory}', dishType= '${req.body.dishType}', dishTag='${req.body.mealType}' where dishID=${req.body.dishId}`, data, (err, results, fields)=>{
             !err? res.json(results): res.json(err);
@@ -380,10 +405,20 @@ app.post('/addRestaurantMenu', (req,res)=>{
 
 app.get('/basicDetail', verifyToken, (req,res) => {
     const tokenHeader = req.headers['x-authentication-header'];
-    var decoded = jwt.verify(tokenHeader, 'my-secret-key-0001xx01212032432');
-    const mobileNumber = req.query.restaurandId ? req.query.restaurandId : decoded.data.mobileNumber
-    console.log(mobileNumber);
-    connection.query(`SELECT * FROM Restaurants where mobileNumber='${mobileNumber}'`,
+    if(tokenHeader != 'null'){
+        var decoded = jwt.verify(tokenHeader, 'my-secret-key-0001xx01212032432');
+        const mobileNumber = req.query.restaurandId ? req.query.restaurandId : decoded.data.mobileNumber
+        console.log(mobileNumber);
+        connection.query(`SELECT * FROM Restaurants where mobileNumber='${mobileNumber}'`,
+        (err, rows, fields)=>{
+            if(!err){
+                res.send(rows[0]);
+            }else{
+                console.log(err);
+            }
+        })
+    }else{
+    connection.query(`SELECT * FROM Restaurants where mobileNumber='${req.query?.restaurandId}'`,
     (err, rows, fields)=>{
         if(!err){
             res.send(rows[0]);
@@ -391,6 +426,8 @@ app.get('/basicDetail', verifyToken, (req,res) => {
             console.log(err);
         }
     })
+    }
+    
 });
 
 app.get('/customerBasicDetail', verifyToken, (req,res) => {

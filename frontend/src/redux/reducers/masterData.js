@@ -300,7 +300,8 @@ export const masterData = createSlice({
       mealType: [],
       dishCategory: [],
       dishType: [],
-      restaurants: []
+      restaurants: [],
+      restaurantType: []
     },
     dishes: [],
   },
@@ -328,7 +329,8 @@ export const masterData = createSlice({
         mealType: [],
         dishCategory: [],
         dishType: [],
-        restaurants: []
+        restaurants: [],
+        restaurantType: []
       }
     }
   },

@@ -773,7 +773,7 @@ export default class AddRestaurant extends Component {
                     }
                   >
                     <option value="Veg">Veg</option>
-                    <option value="Nonveg">NonVeg</option>
+                    <option value="Nonveg">Nonveg</option>
                   </select>
                 </div>
 

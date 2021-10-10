@@ -192,6 +192,7 @@ export default function CustomDrawer(props) {
       localStorage.removeItem("role");
       localStorage.removeItem("token");
     })
+    setCartData([])
     forceRender();
   }
   function handleSearchText(e){
@@ -225,7 +226,8 @@ export default function CustomDrawer(props) {
         mealType: [],
         dishCategory: [],
         dishType: [],
-        restaurants: []
+        restaurants: [],
+        restaurantType: []
       }
       loadDishData();
   }
@@ -238,7 +240,8 @@ export default function CustomDrawer(props) {
       mealType: [],
       dishCategory: [],
       dishType: [],
-      restaurants: []
+      restaurants: [],
+      restaurantType: []
     }
     loadDishData();
   }
@@ -347,7 +350,7 @@ export default function CustomDrawer(props) {
             <Route exact path='/login' component={Login} />
             <Route exact path='/add-restaurant' component={AddRestaurant} />
             <Route exact path='/orders' component={RestaurantOrders} />
-            <Route exact path='/my-restaurant' component={RestaurantHome} />
+            <Route exact path='/my-restaurant' component={() => <RestaurantHome refreshCart={loadCartData}/>} />
             <Route exact path='/register' component={Register} />
             <Route exact path='/profile' component={Register} />
             <Route exact path='/logout' component={Login} />
@@ -405,8 +408,16 @@ export default function CustomDrawer(props) {
           <div style={{padding: '20px', width: '150px'}}>
             <p>Dish Type</p>
             <div class='d-flex justify-content-between'><span><input type='checkbox' name='dishType' onChange={handleFilterSelect} value='Veg' checked={filters.dishType.includes('Veg') ? true : false}/></span><span>Veg</span></div>
-            <div class='d-flex justify-content-between'><span><input type='checkbox' name='dishType' onChange={handleFilterSelect} value='Non veg' checked={filters.dishType.includes('Non veg') ? true : false}/></span><span>Non Veg</span></div>
+            <div class='d-flex justify-content-between'><span><input type='checkbox' name='dishType' onChange={handleFilterSelect} value='Nonveg' checked={filters.dishType.includes('Nonveg') ? true : false}/></span><span>Nonveg</span></div>
           </div>
+
+          <div style={{padding: '20px', width: '150px'}}>
+            <p>Restaurant Type</p>
+            <div class='d-flex justify-content-between'><span><input type='checkbox' name='restaurantType' onChange={handleFilterSelect} value='Delivery' checked={filters.restaurantType.includes('Delivery') ? true : false}/></span><span>Delivery</span></div>
+            <div class='d-flex justify-content-between'><span><input type='checkbox' name='restaurantType' onChange={handleFilterSelect} value='Pickup' checked={filters.restaurantType.includes('Pickup') ? true : false}/></span><span>Pickup</span></div>
+            <div class='d-flex justify-content-between'><span><input type='checkbox' name='restaurantType' onChange={handleFilterSelect} value='Delivery and Pickup' checked={filters.restaurantType.includes('Delivery and Pickup') ? true : false}/></span><span>Delivery and Pickup</span></div>
+          </div>
+          
           {/* <div style={{padding: '20px', width: '150px'}}>
              <p>Restaurants</p>
           </div> */}

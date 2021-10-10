@@ -6,6 +6,7 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import IconButton from '@mui/material/IconButton';
 import PopUp from '../../components/Popup/Popup';
+import {Link} from 'react-router-dom';
 
 export default function Card(props){
     const [open, setOpen] = useState(false);
@@ -39,7 +40,7 @@ export default function Card(props){
     
     return(
     <div className="cardBody">
-            <img className="card-img-top" src={imageURL} alt="Card image cap"  onClick={()=>props.navigate(props.item.mobileNumber)}/>
+            <Link to={'/my-restaurant?resId='+ props.item.mobileNumber}><img className="card-img-top" src={imageURL} alt="Card image cap" /></Link>
                 <div className="card-body">
                 <h5 className="card-title">{props.item.restaurant}</h5>
                             <div className="d-flex justify-content-between align-items-center p-2">
@@ -48,7 +49,7 @@ export default function Card(props){
                             </div>
 
                             <div className="d-flex justify-content-between align-items-center p-2">
-                                    <span  onClick={()=>props.navigate(props.item.mobileNumber)} style={{color: '#06c167', fontSize: '14px'}} className="card-text">{props.item.name}</span> 
+                                <Link to={'/my-restaurant?resId='+ props.item.mobileNumber}><span style={{color: '#06c167', fontSize: '14px'}} className="card-text">{props.item.name}</span></Link> 
                             </div>
                             
                             <div className="d-flex justify-content-between align-items-center">
@@ -62,7 +63,7 @@ export default function Card(props){
                                     </IconButton>
                                 </div>
 
-                                {props.item.dishType ? <CircleIcon style={{color: 'green', fontSize: '20px', right: 0}}/> : <CircleIcon style={{color: 'red', fontSize: '20px'}}/>}
+                                {props.item.dishType =='Veg' ? <CircleIcon style={{color: 'green', fontSize: '20px', right: 0}}/> : <CircleIcon style={{color: 'red', fontSize: '20px'}}/>}
                             </div>
                             </div>
                             <PopUp open={open} message={message}/>

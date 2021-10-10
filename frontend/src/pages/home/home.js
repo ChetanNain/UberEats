@@ -18,10 +18,10 @@ export class Home extends Component{
         console.log(this.props.applyFilter, "hello")
         return (
             <div>
-                <SimpleSlider data = {this.props.dishes.filter(dish=> dish.dishCategory == 'Trending Now')} slickHeading = "Trending Now" navigate={this.navigateToRestaurantHome} refreshCart={this.props.refreshCart}/>
-                <SimpleSlider data = {this.props.dishes.filter(dish=> dish.dishCategory == 'Healthy Eating')} slickHeading = "Healthy Eating" navigate={this.navigateToRestaurantHome} refreshCart={this.props.refreshCart}/>
-                <SimpleSlider data = {this.props.dishes.filter(dish=> dish.dishCategory == 'Easy on Pocket')} slickHeading = "Easy On Pocket" navigate={this.navigateToRestaurantHome} refreshCart={this.props.refreshCart}/>
-                <SimpleSlider data = {this.props.dishes.filter(dish=> dish.dishCategory == 'Todays Offer')} slickHeading = "Todays Offer" navigate={this.navigateToRestaurantHome} refreshCart={this.props.refreshCart}/>
+                <SimpleSlider data = {this.props.dishes.filter(dish=> dish.dishCategory == 'Trending Now')} slickHeading = "Trending Now" refreshCart={this.props.refreshCart}/>
+                <SimpleSlider data = {this.props.dishes.filter(dish=> dish.dishCategory == 'Healthy Eating')} slickHeading = "Healthy Eating" refreshCart={this.props.refreshCart}/>
+                <SimpleSlider data = {this.props.dishes.filter(dish=> dish.dishCategory == 'Easy on Pocket')} slickHeading = "Easy On Pocket" refreshCart={this.props.refreshCart}/>
+                <SimpleSlider data = {this.props.dishes.filter(dish=> dish.dishCategory == 'Todays Offer')} slickHeading = "Todays Offer" refreshCart={this.props.refreshCart}/>
             </div>
         )
     }
