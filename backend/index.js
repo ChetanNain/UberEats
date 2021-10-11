@@ -29,7 +29,6 @@ app.use(express.urlencoded({extended:false}));
 
 var connection = mysql.createPool({
     host:constants.DB.host,
-
     user:constants.DB.username,
     password: constants.DB.password,
     port: constants.DB.port,
@@ -42,6 +41,22 @@ connection.getConnection((err) =>{
     }
     console.log("Connection Created");
 });
+
+
+// var connection = mysql.createConnection({
+//     host:constants.DB.host,
+//     user:constants.DB.username,
+//     password: constants.DB.password,
+//     port: constants.DB.port,
+//     database: constants.DB.database 
+// });
+
+// connection.connect((err) => {
+//     if (err) throw err;
+//     console.log('Connected to MySQL Server!');
+//   });
+
+
 
 app.use(cors())
 
@@ -535,5 +550,8 @@ app.post("/upload", (req, res)=> {
 app.listen(3001, function () {
     console.log("Server listening on port 3001");
 });
+
+module.exports = app;
+
 
 
