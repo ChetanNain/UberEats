@@ -59,7 +59,7 @@ connection.getConnection((err) =>{
 
 
 app.use(cors())
-
+//done
 //Get a restaurant
 app.get('/restaurants',(req,res)=>{
     const tokenHeader = req.headers['x-authentication-header'];
@@ -85,14 +85,8 @@ app.get('/restaurants',(req,res)=>{
    
 })
 
-//Update phone number.
-app.put('/restaurants/:restaurantID/:restaurantContact', (req,res,next)=>{
-        let data = [req.params.restaurantID, req.params.restaurantContact];
-        connection.query('UPDATE UberEats.Restaurants SET Contact= ? where ID = ?', data, (err,results,fields)=>{
-            !err? res.json(results): res.json(err);
-        })
-})
 
+//done
 //add Dishes
 app.post('/restaurants/addDishes',(req,res,next)=>{
     let data = [req.body.restaurantID,req.body.dishName,req.body.mainIngredients,req.body.dishImage,req.body.dishPrice,req.body.description,req.body.dishCategory];
@@ -101,6 +95,7 @@ app.post('/restaurants/addDishes',(req,res,next)=>{
     })
 })
 
+//done
 app.post('/dishes', function (req, res) {
     const filters = req.body;
     let query = 'Select dish.dishId as id, dish.dishImage, dish.dishType as dishType, res.mobileNumber as mobileNumber, dish.dishName, dish.dishCategory, dish.dishPrice as price, dish.dishTag as dishTag, res.name, res.city, res.restaurantType from Restaurants as res Inner Join Dishes  as dish ON res.mobileNumber=dish.restaurantMobileNumber where 1 = 1';
@@ -130,6 +125,8 @@ app.post('/dishes', function (req, res) {
         }
     })
 });
+
+//done
 //Dishes by restaurant
 app.get('/restaurantDishes', function (req, res) {
     const tokenHeader = req.headers['x-authentication-header'];
@@ -186,7 +183,7 @@ app.put('/customers/:customerID/:phoneNumber', (req,res,next)=>{
 
 
 
-
+//done
 app.get('/addToCart/:dishId', (req, res) =>{
     console.log(req.query, "params")
     const type = req.query.type || 0;
@@ -229,6 +226,7 @@ app.get('/checkout', (req,res) =>{
     res.send(200);
 });
 
+//done
 app.post('/removeFromCart', (req, res) =>{
     const itemId = req.body.itemId;
     console.log(itemId);
@@ -243,7 +241,7 @@ app.post('/removeFromCart', (req, res) =>{
     });
     
 })
-
+//done
 app.get('/cart', verifyToken, function(req,res){
         const tokenHeader = req.headers['x-authentication-header'];
         var decoded = jwt.verify(tokenHeader, 'my-secret-key-0001xx01212032432');
@@ -259,7 +257,7 @@ app.get('/cart', verifyToken, function(req,res){
             }
      })
 });
-
+//done
 app.get('/orders', (req, res) =>{
     const tokenHeader = req.headers['x-authentication-header'];
     var decoded = jwt.verify(tokenHeader, 'my-secret-key-0001xx01212032432');
@@ -300,7 +298,7 @@ app.get("/logout", function (req, res) {
         }
     })
 });
-
+//done
 app.post('/removeFromCart', (req, res) =>{
     const itemId = req.body.itemId;
     console.log(itemId);
@@ -313,10 +311,9 @@ app.post('/removeFromCart', (req, res) =>{
             console.log(err);
         }
     });
-    
 })
 
-
+//done
 app.post('/updateOrderStatus',(req,res)=>{
     const orderStatus = req.body.orderStatus;
     const orderID = req.body.orderID;
@@ -331,7 +328,7 @@ app.post('/updateOrderStatus',(req,res)=>{
     
 })
 
-
+//done
 app.post('/addRestaurantBasicDetail', (req,res)=>{
     const tokenHeader = req.headers['x-authentication-header'];
     var decoded = jwt.verify(tokenHeader, 'my-secret-key-0001xx01212032432');
@@ -341,7 +338,7 @@ app.post('/addRestaurantBasicDetail', (req,res)=>{
         !err? res.send(200):res.json(err);
     } )
 })
-
+//done
 app.post('/addCustomerDetail', (req,res)=>{
     bcrypt.hash(req.body.password, saltRounds, function(err, hash) {
         let uType=0;
@@ -399,7 +396,7 @@ app.post('/addCustomerDetail', (req,res)=>{
     })
 })
 
-
+//done
 app.post('/addRestaurantMenu', (req,res)=>{
     const tokenHeader = req.headers['x-authentication-header'];
     var decoded = jwt.verify(tokenHeader, 'my-secret-key-0001xx01212032432');
@@ -414,7 +411,6 @@ app.post('/addRestaurantMenu', (req,res)=>{
             !err? res.json(results): res.json(err);
         } )
     }
-    
 })
 
 
@@ -444,7 +440,7 @@ app.get('/basicDetail', verifyToken, (req,res) => {
     }
     
 });
-
+//done
 app.get('/customerBasicDetail', verifyToken, (req,res) => {
     const tokenHeader = req.headers['x-authentication-header'];
     var decoded = jwt.verify(tokenHeader, 'my-secret-key-0001xx01212032432');
@@ -464,6 +460,7 @@ app.get('/customerBasicDetail', verifyToken, (req,res) => {
     })
 });
 
+//done
 app.get('/menuDetails',(req,res) => {
     const tokenHeader = req.headers['x-authentication-header'];
     var decoded = jwt.verify(tokenHeader, 'my-secret-key-0001xx01212032432');
@@ -477,6 +474,7 @@ app.get('/menuDetails',(req,res) => {
     })
 });
 
+//done
 app.get('/removeItem/:dishID',(req,res)=> {
     console.log(req.params.dishID);
     connection.query(`DELETE FROM Dishes where dishId='${req.params.dishID}'`,
@@ -526,13 +524,13 @@ app.post('/login', (req, res)=>{
   })
 })
 
-
+//added
 function verifyToken(req, res, next){
     const tokenHeader = req.headers['x-authentication-header'];
     if(tokenHeader != 'null'){ 
         if(jwt.verify(tokenHeader, 'my-secret-key-0001xx01212032432')){
             next();
-        } 
+        }
     }else{
         res.status(401).json({msg: 'Unauthorized!'})
     }

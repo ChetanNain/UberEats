@@ -67,7 +67,10 @@ export default function Register(props) {
     if (!registrationData.fullName) { 
       setErrorMessage("Name can't be empty");
       return false;
-    } else if (registrationData.password && registrationData.password.length < 6) {
+    } else if(!ValidateDOB(registrationData.dateOfBirth)){
+      //setErrorMessage("Please enter a correct date of birth");
+    }    
+    else if (registrationData.password && registrationData.password.length < 6) {
       setErrorMessage("Password must be between 6-20 characters.");
       return false;
     } else if (registrationData.email && !validateEmail(registrationData.email)) {
@@ -106,6 +109,37 @@ export default function Register(props) {
     const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return re.test(String(email).toLowerCase());
   }
+
+  function ValidateDOB(dob) {
+    var dateString = dob;
+    var regex = /(((0|1)[0-9]|2[0-9]|3[0-1])\-(0[1-9]|1[0-2])\-((19|20)\d\d))$/;
+    if (regex.test(dateString)) {
+        var parts = dateString.split("-");
+        var dtDOB = new Date(parts[1] + "-" + parts[0] + "-" + parts[2]);
+        var dtCurrent = new Date();
+        setErrorMessage("Eligibility 14 years ONLY.")
+        if (dtCurrent.getFullYear() - dtDOB.getFullYear() < 14) {
+            return false;
+        }
+        if (dtCurrent.getFullYear() - dtDOB.getFullYear() == 14) {
+            if (dtCurrent.getMonth() < dtDOB.getMonth()) {
+                return false;
+            }
+            if (dtCurrent.getMonth() == dtDOB.getMonth()) {
+                if (dtCurrent.getDate() < dtDOB.getDate()) {
+                    return false;
+                }
+            }
+        }
+        setErrorMessage("");
+        return true;
+    } else {
+        setErrorMessage("Please enter a correct date and in dd-mm-yyyy format.");
+        return false;
+    }
+  }
+
+
 
   function savecustomerData() {
     if (!valdiate()) return;
@@ -360,3 +394,4 @@ export default function Register(props) {
     </div>
   );
 }
+
