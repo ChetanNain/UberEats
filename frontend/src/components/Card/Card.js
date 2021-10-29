@@ -21,7 +21,7 @@ export default function Card(props){
         if(flag === 2){
             setMessage('Dish has been added to the Favorite!');
         }
-        axios.get(`http://${window.location.hostname}:3001/addToCart/` + props.item.id+"?type="+flag, headerConfig)
+        axios.get(`http://${window.location.hostname}:3001/addToCart/` + props.item._id+"?type="+flag, headerConfig)
         .then(
             res => {
                props.refreshCart()
@@ -32,8 +32,6 @@ export default function Card(props){
             }
         )
     }
-
-
     function addToFavorite(){
         addToCart(2);
     }
@@ -45,7 +43,7 @@ export default function Card(props){
                 <h5 className="card-title">{props.item.restaurant}</h5>
                             <div className="d-flex justify-content-between align-items-center p-2">
                                     <span className="card-text">{props.item.dishName}</span> 
-                                     <span className="card-text">{props.item.price + '$'}</span>
+                                     <span className="card-text">{props.item.dishPrice || props.item.itemPrice+ '$'}</span>
                             </div>
 
                             <div className="d-flex justify-content-between align-items-center p-2">
@@ -61,9 +59,9 @@ export default function Card(props){
                                     <IconButton className="favoriteButton" onClick={addToFavorite} aria-label="add to favorites" style={{color: props.item.checkedOut  == 2 ? 'red' : ''}}>
                                         <FavoriteIcon />
                                     </IconButton>
-                                </div>
-
-                                {props.item.dishType =='Veg' ? <CircleIcon style={{color: 'green', fontSize: '20px', right: 0}}/> : <CircleIcon style={{color: 'red', fontSize: '20px'}}/>}
+                                </div>  
+ 
+                                {props.item.dishTag =='Veg' ? <CircleIcon style={{color: 'green', fontSize: '20px', right: 0}}/> : <CircleIcon style={{color: 'red', fontSize: '20px'}}/>}
                             </div>
                             </div>
                             <PopUp open={open} message={message}/>

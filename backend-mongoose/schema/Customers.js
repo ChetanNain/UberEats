@@ -10,7 +10,7 @@ var Customers = new mongoose.Schema({
     favorites:Array,
     profilePicture: String,
     language:String,
-    resFlag:String,
+    restFlg:Number,
     address:Array    
 });
   

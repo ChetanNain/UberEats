@@ -14,8 +14,8 @@ export default function CartList(props) {
                         <td><input type="number" value="1"></input></td>
                             <div>
                                 <p>{props.cartItem.dishName}</p>
-                                <small>Price: {props.cartItem.price}</small>
-                                <p className='removeItem' style={{color:'#06c167', cursor: 'pointer'}} onClick={()=>props.removeItem(props.cartItem.id)}>Remove</p>
+                                <small>Price: {props.cartItem.dishPrice}</small>
+                                <p className='removeItem' style={{color:'#06c167', cursor: 'pointer'}} onClick={()=>props.removeItem(props.cartItem._id)}>Remove</p>
                             </div>
                         </div>
                     </td>
@@ -24,4 +24,3 @@ export default function CartList(props) {
         </div>
     )
 }
-

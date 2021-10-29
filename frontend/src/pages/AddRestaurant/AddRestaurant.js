@@ -526,8 +526,6 @@ export default class AddRestaurant extends Component {
             return true;
         }
     }
-
-
     saveMenu(){
         const headerConfig = {
             headers: {

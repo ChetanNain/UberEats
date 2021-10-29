@@ -13,6 +13,25 @@ const cors = require('cors')
 app.use(cors())
 const bcrypt = require("bcrypt");
 var jwt = require("jsonwebtoken");
+var jwt = require('jsonwebtoken');
+const multer = require("multer");
+const path = require("path");
+const Dishes = require("./schema/Dishes");
+
+let fileName;
+const storage = multer.diskStorage({
+   destination: "./public/uploads/",
+   filename: function(req, file, cb){
+       fileName = "IMAGE-" + Date.now() + path.extname(file.originalname);
+       cb(null, fileName);
+   }
+});
+
+const upload = multer({
+   storage: storage,
+   limits:{fileSize: 1000000},
+}).single("myImage");
+
 //const { response } = require("../backend");
 //const { request } = require("../backend");
 const saltRounds = 10;
@@ -133,7 +152,7 @@ app.get("/addToCart/:dishId", async (req, res) => {
     quantity: 1,
     itemPrice: parseFloat(dish.dishPrice),
     totalPrice: dish.dishPrice * 1,
-    checkedOut: 0,
+    checkedOut: type,
   };
   const cart = new Cart(cartData);
   cart.save();
@@ -147,7 +166,7 @@ app.post("/removeFromCart", (req, res) => {
     if (err) throw err;
     console.log("1 document deleted");
     res.sendStatus(200);
-    db.close();
+    // db.close();
   });
 });
 
@@ -212,9 +231,9 @@ app.post("/updateOrderStatus", (req, res) => {
 
 app.get("/restaurantDishes", async function (req, res) {
   const tokenHeader = req.headers["x-authentication-header"];
+  
   if (tokenHeader != "null") {
     var decoded = jwt.verify(tokenHeader, "my-secret-key-0001xx01212032432");
-
     try {
       //const restaurantMobileNumber = req.query.restaurandId ? req.query.restaurandId : decoded.data.mobileNumber;
       var restaurantMobileNumber = { restaurantMobileNumber: decoded.data.mobileNumber };
@@ -254,7 +273,7 @@ app.post("/addCustomerDetail", async (req, res) => {
       email: req.body.email,
       mobileNumber: req.body.mobileNumber,
       password: hash,
-      address: req.body.address,
+      address: [{address: req.body.address, city: req.body.city, state: req.body.state, country: req.body.country}]
     };
     if (customer) {
       Customers.updateOne(
@@ -267,6 +286,15 @@ app.post("/addCustomerDetail", async (req, res) => {
         }
       );
     } else {
+      customerObj = {
+        fullName: req.body.fullName,
+        dateOfBirth: req.body.dateOfBirth,
+        email: req.body.email,
+        mobileNumber: req.body.mobileNumber,
+        password: hash,
+        address: [{address: req.body.address, city: req.body.city, state: req.body.state, country: req.body.country}],
+        restFlg : uType
+      };
       db.collection("customers").insertOne(
         customerObj,
         function (err, results) {
@@ -306,31 +334,35 @@ app.post("/addCustomerDetail", async (req, res) => {
 });
 
 
-
-
-
-
 app.post("/dishes", async function (req, res) {
   let matcher = {
     dishType: { $in: req.body.mealType },
      /* dishTag: { $in: req.body.dishType },
     dishCategory: { $in: req.body.dishCategory },
-    restaurantType: { $in: req.body.restaurantType } */ 
-  };
-  let query = Dish.aggregate([
-    {
-      $lookup: {
-        from: "restaurants",
-        localField: "restaurantMobileNumber",
-        foreignField: "mobileNumber",
-        as: "restaurantMobileNumber",
-      },
-    },
-    { $match: matcher },
-  ]);
-  var response = await query;
-  console.log(response);
-  res.status(200).json(response);
+    restaurantType: { $in: req.body.restaurantType
+   */ 
+    } 
+  let query  = Dish.find({}).populate("restaurantId");
+  if(req.body.mealType?.length){
+      query = query.where('dishType').in(req.body.mealType)
+  }
+  if(req.body.dishType?.length){
+    query = query.where('dishTag').in(req.body.dishType)
+  }
+  if( req.body.dishCategory?.length){
+    query = query.where('dishCategory').in(req.body.dishCategory)
+  }
+  if( req.body.restaurantType?.length){
+    query = query.where('restaurantType').in(req.body.restaurantType)
+  }
+    let dish = await query.exec();
+    if(req.body.searchQuery) {
+      dish = dish.filter(row => {
+        const searchArr = [row.dishName?.toLowerCase(), row.city?.toLowerCase(), row.dishTag?.toLowerCase(), row.dishType?.toLowerCase(), row.name?.toLowerCase(), row.dishCategory?.toLowerCase()];
+        return searchArr.includes(req.body.searchQuery.toLowerCase())
+    });
+    }
+    res.status(200).json(dish);
 });
 
 
@@ -338,19 +370,10 @@ app.post("/dishes", async function (req, res) {
 app.get("/cart", verifyToken, async function (req, res) {
   const tokenHeader = req.headers["x-authentication-header"];
   var decoded = jwt.verify(tokenHeader, "my-secret-key-0001xx01212032432");
-  let matcher = { customerMobileNumber: { $eq: decoded.data.mobileNumber } };
-  let query = Cart.aggregate([
-    {
-      $lookup: {
-        from: "dishes", //or Races.collection.name
-        localField: "restaurantMobileNumber",
-        foreignField: "mobileNumber",
-        as: "mobileNumber",
-      },
-    },
-    { $match: matcher },
-  ]);
+  let matcher = {customerMobileNumber: { $eq: decoded.data.mobileNumber } };
+  let query =  Cart.find({}).populate("dishId").exec();
   var response = await query;
+  console.log(response)
   res.status(200).json(response);
 });
 
@@ -389,31 +412,36 @@ app.get("/customerBasicDetail", verifyToken, async (req, res) => {
   const tokenHeader = req.headers["x-authentication-header"];
   var decoded = jwt.verify(tokenHeader, "my-secret-key-0001xx01212032432");
   const filters = req.body;
-  console.log(decoded.data.mobileNumber);
+  //console.log(decoded.data.mobileNumber);
   let matcher = { mobileNumber: decoded.data.mobileNumber };
-  let query = Customers.find(matcher);
+  let query = Customers.findOne(matcher);
   var response = await query;
   res.status(200).json(response);
 });
 
+
+//changed the place of jwt.verify()
 app.get("/basicDetail", verifyToken, async (req, res) => {
   const tokenHeader = req.headers["x-authentication-header"];
-  const mobileNumber = req.query.restaurandId
-    ? req.query.restaurandId
-    : decoded.data.mobileNumber;
+  var decoded = jwt.verify(tokenHeader, "my-secret-key-0001xx01212032432");
+  //console.log(decoded);
+  const mobileNumber = req.query.restaurandId ? req.query.restaurandId : decoded.data.mobileNumber;
   if (tokenHeader != "null") {
-    var decoded = jwt.verify(tokenHeader, "my-secret-key-0001xx01212032432");
-    console.log(mobileNumber);
+    //var decoded = jwt.verify(tokenHeader, "my-secret-key-0001xx01212032432");
+    //console.log(mobileNumber);
+    console.log("in if of /basicDetails")
     try {
       //const restaurantMobileNumber = req.query.restaurandId ? req.query.restaurandId : decoded.data.mobileNumber;
       var restaurantMobileNumber = { restaurantMobileNumber: mobileNumber };
       const restaurant = await Restaurant.find(restaurantMobileNumber);
+      console.log(restaurant);
       res.json(restaurant);
     } catch (err) {
       res.status(500).json({ message: err.message });
     }
   } else {
     //check the else part.
+    console.log("In Else of /basicDetails.")
     connection.query(
       `SELECT * FROM Restaurants where mobileNumber='${req.query?.restaurandId}'`,
       (err, rows, fields) => {
@@ -431,9 +459,10 @@ app.post('/login', async (req, res)=>{
   const mobileNumber = req.body.mobileNumber;
   const password = req.body.password;
   const results = await Customers.find({email: mobileNumber})
-  console.log(results)
+  //console.log(results)
+  console.log(results[0].restFlg)
       if(results.length > 0){
-          bcrypt.compare(password, results[0].password, function(err, result) {
+          bcrypt.compare(password, results[0].password, function(err, result){
               if(!err){
                   const token = jwt.sign({
                       data: {
@@ -482,3 +511,13 @@ app.get("/logout", function (req, res) {
       }
   })
 });
+
+
+app.post("/upload", (req, res)=> {
+  upload(req, res, (err) => {
+     if(!err)
+        return res.status(200).json({fileName: fileName});
+  });
+});
+
+app.use('/resources',express.static(__dirname + '/public/uploads'));

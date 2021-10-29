@@ -51,13 +51,13 @@ export default function Register(props) {
         dispatch(stateChangeHandler({ name: "mobileNumber", value: res.data.mobileNumber }));
         dispatch(stateChangeHandler({ name: "country", value: res.data.country }));
         dispatch(stateChangeHandler({ name: "provience", value: res.data.state }));
-        dispatch(stateChangeHandler({ name: "address", value: res.data.address }));
+        dispatch(stateChangeHandler({ name: "address", value: res.data.address[0].address }));
         dispatch(stateChangeHandler({ name: "email", value: res.data.email }));
         dispatch(stateChangeHandler({ name: "dateOfBirth", value: res.data.dateOfBirth }));
         dispatch(stateChangeHandler({ name: "language", value: res.data.language }));
         dispatch(stateChangeHandler({ name: "password", value: res.data.password }));
         dispatch(stateChangeHandler({ name: "userType", value: res.data.userType }));
-        dispatch(stateChangeHandler({ name: "city", value: res.data.city }));
+        dispatch(stateChangeHandler({ name: "city", value: res.data.address[0].city }));
         setProfilePic(`http://${window.location.hostname}:3001/resources/${res.data.favorites}`);
       }
     });
@@ -386,6 +386,10 @@ export default function Register(props) {
     <p>Favorites</p>
       <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr'}}>
         {cartData.map(item=>{
+            item.dishName = item.dishId.dishName;
+            item.dishTag = item.dishId.dishTag;
+            item.dishImage = item.dishId.dishImage;
+            item.mobileNumber = item.restaurantMobileNumber;
             return item.checkedOut === 2 ? <Card item={item}/> : ''
         })}
     </div>

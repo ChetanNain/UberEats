@@ -4,12 +4,12 @@ var mongoose = require('mongoose');
 var Cart = new mongoose.Schema({
     //_id : mongoose.Obj,
     customerMobileNumber: Number,
-    dishId: mongoose.Schema.ObjectId,
+    dishId: { type: mongoose.Schema.ObjectId, ref: 'Dishes'},
     restaurantMobileNumber: Number,
     quantity: Number,
-    itemPrice: mongoose.Types.Decimal128,
-    totalPrice:mongoose.Types.Decimal128,
-    checkedOut: Number
+    itemPrice: Number,
+    totalPrice:Number,
+    checkedOut: Number,
 });
   
 module.exports = mongoose.model('Cart', Cart);

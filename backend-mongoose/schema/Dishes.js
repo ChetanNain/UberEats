@@ -11,7 +11,8 @@ var Dishes = new mongoose.Schema({
     description: String,
     dishCategory:String,
     dishTag:String,
-    dishType:String  
+    dishType:String,  
+    restaurantId: { type: mongoose.Schema.Types.ObjectId, ref: 'restaurant'},
 });
   
 module.exports = mongoose.model('Dishes', Dishes);
