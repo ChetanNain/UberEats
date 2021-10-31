@@ -579,18 +579,18 @@ export default class AddRestaurant extends Component {
             }).catch((error) => {
         });
     }
-
+   
 
     saveRestaurantData(){
         if(this.validateBasicFromDetail() === false) return;
         const basicDetails= {
-                restaurantName: this.state.restaurantName,
-                restaurantAddress: this.state.restaurantAddress,
-                restaurantCity: this.state.restaurantLocation,
-                restaurantProvience: this.state.restaurantProvience || 'US',
-                restaurantCountry: this.state.restaurantCountry || 'AL',
-                restaurantPincode: this.state.restaurantPincode,
-                restaurantDescription: this.state.restaurantDescription,
+                name: this.state.restaurantName,
+                address: this.state.restaurantAddress,
+                city: this.state.restaurantLocation,
+                provience: this.state.restaurantProvience || 'US',
+                country: this.state.restaurantCountry || 'AL',
+                pincode: this.state.restaurantPincode,
+                description: this.state.restaurantDescription,
                 restaurantType: this.state.restaurantType || 'Delivery'
         }
 

@@ -438,7 +438,7 @@ app.get('/basicDetail', verifyToken, (req,res) => {
         }
     })
     }
-    
+
 });
 //done
 app.get('/customerBasicDetail', verifyToken, (req,res) => {

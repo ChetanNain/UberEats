@@ -109,21 +109,59 @@ app.get("/customers", async function (req, res) {
   }
 });
 
-app.post("/addRestaurantBasicDetail", (req, res) => {
+
+//Inserting new record on adding details again.
+app.post("/addRestaurantBasicDetail", async (req, res) => {
   const tokenHeader = req.headers["x-authentication-header"];
   var decoded = jwt.verify(tokenHeader, "my-secret-key-0001xx01212032432");
   // let data = [decoded.data.mobileNumber, req.body.restaurantName, req.body.restaurantAddress, req.body.restaurantCity, req.body.restaurantProvience, req.body.restaurantCountry, req.body.restaurantPincode,null, req.body.restaurantDescription, req.body.restaurantType ]
-  db.collection("restaurants").insertOne(req.body, function (err, result) {
-    if (err) throw err;
-    console.log("1 document inserted");
-    res.sendStatus(200);
+  const find = Restaurant.findOne({mobileNumber: decoded.data.mobileNumber})
+  const restObj = {...req.body,
+    mobileNumber: decoded.data.mobileNumber};
+    console.log(restObj);
+  
+  if(find){
+    Restaurant.updateOne(
+      { mobileNumber: decoded.data.mobileNumber },
+      { $set: restObj },
+      function (err, result) {
+        if (err) throw err;
+        console.log("1 document updated");
+        res.sendStatus(200);
+      }
+    );
+  }else{
+  const restObj = new Restaurant(rest);
+  const data  = await restObj.save();
+  res.status(200).json({data})
+  // db.collection("restaurants").insertOne(req.body, function (err, result) {
+  //   if (err) throw err;
+    console.log("1 document Inserted");
+  }
+  //   res.sendStatus(200);
   });
-});
+//});
 
 app.post("/addRestaurantMenu", async (req, res) => {
   const tokenHeader = req.headers["x-authentication-header"];
   var decoded = jwt.verify(tokenHeader, "my-secret-key-0001xx01212032432");
-  const dish = { ... req.body };
+  let matcher = {mobileNumber: { $eq: decoded.data.mobileNumber } };
+
+  const restaurant = await Restaurant.find(matcher);
+  console.log(restaurant._id);
+  const dish = {
+    restaurantMobileNumber: decoded.data.mobileNumber,
+    dishName: req.body.dishName,
+    mainIngredients: req.body.dishIngredients,
+    dishImage: req.body.image,
+    dishPrice: req.body.dishPrice,
+    description: req.body.dishDescription,
+    dishCategory: req.body.dishCategory,
+    dishTag: req.body.mealType,
+    dishType: req.body.dishType,  
+    restaurantId:  restaurant._id,
+};
+  console.log(dish);
   const dishObj = new Dish(dish);
   const dishId = req.body._id || undefined;
   const existingDish = await Dish.findById(dishId);
@@ -140,7 +178,9 @@ app.post("/addRestaurantMenu", async (req, res) => {
 
 app.get("/addToCart/:dishId", async (req, res) => {
   console.log(req.params.dishId, "params");
+  console.log(req.query);
   const type = req.query.type || 0;
+  
   const tokenHeader = req.headers["x-authentication-header"];
   var decoded = jwt.verify(tokenHeader, "my-secret-key-0001xx01212032432");
   const dish = await Dish.findById(mongoose.Types.ObjectId(req.params.dishId));
@@ -371,9 +411,11 @@ app.get("/cart", verifyToken, async function (req, res) {
   const tokenHeader = req.headers["x-authentication-header"];
   var decoded = jwt.verify(tokenHeader, "my-secret-key-0001xx01212032432");
   let matcher = {customerMobileNumber: { $eq: decoded.data.mobileNumber } };
-  let query =  Cart.find({}).populate("dishId").exec();
+  let query =  Cart.find(matcher).populate("dishId").exec();
   var response = await query;
+  console.log("Inside Cart")
   console.log(response)
+  console.log("Inside Cart")
   res.status(200).json(response);
 });
 
@@ -422,9 +464,9 @@ app.get("/customerBasicDetail", verifyToken, async (req, res) => {
 
 //changed the place of jwt.verify()
 app.get("/basicDetail", verifyToken, async (req, res) => {
+  console.log("in if of /basicDetails")
   const tokenHeader = req.headers["x-authentication-header"];
   var decoded = jwt.verify(tokenHeader, "my-secret-key-0001xx01212032432");
-  //console.log(decoded);
   const mobileNumber = req.query.restaurandId ? req.query.restaurandId : decoded.data.mobileNumber;
   if (tokenHeader != "null") {
     //var decoded = jwt.verify(tokenHeader, "my-secret-key-0001xx01212032432");
@@ -432,8 +474,8 @@ app.get("/basicDetail", verifyToken, async (req, res) => {
     console.log("in if of /basicDetails")
     try {
       //const restaurantMobileNumber = req.query.restaurandId ? req.query.restaurandId : decoded.data.mobileNumber;
-      var restaurantMobileNumber = { restaurantMobileNumber: mobileNumber };
-      const restaurant = await Restaurant.find(restaurantMobileNumber);
+      var restaurantMobileNumber = { mobileNumber: mobileNumber };
+      const restaurant = await Restaurant.findOne(restaurantMobileNumber);
       console.log(restaurant);
       res.json(restaurant);
     } catch (err) {

@@ -4,7 +4,7 @@ var mongoose = require('mongoose');
 var Cart = new mongoose.Schema({
     //_id : mongoose.Obj,
     customerMobileNumber: Number,
-    dishId: { type: mongoose.Schema.ObjectId, ref: 'Dishes'},
+    dishId: { type: mongoose.Schema.Types.ObjectId, ref: 'Dishes'},
     restaurantMobileNumber: Number,
     quantity: Number,
     itemPrice: Number,

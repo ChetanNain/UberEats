@@ -12,7 +12,8 @@ export default function Card(props){
     const [open, setOpen] = useState(false);
     const imageURL = `http://${window.location.hostname}:3001/resources/${props.item.dishImage}`;
     const [message, setMessage] = useState('Dish has been added to the cart!');
-     var addToCart =(flag = 0)=>{
+
+    var addToCart = (flag)=>{
         const headerConfig = {
             headers: {
                 'x-authentication-header': localStorage.getItem('token')
@@ -21,6 +22,7 @@ export default function Card(props){
         if(flag === 2){
             setMessage('Dish has been added to the Favorite!');
         }
+        //console.log(flag);
         axios.get(`http://${window.location.hostname}:3001/addToCart/` + props.item._id+"?type="+flag, headerConfig)
         .then(
             res => {
@@ -35,7 +37,7 @@ export default function Card(props){
     function addToFavorite(){
         addToCart(2);
     }
-    
+
     return(
     <div className="cardBody">
             <Link to={'/my-restaurant?resId='+ props.item.mobileNumber}><img className="card-img-top" src={imageURL} alt="Card image cap" /></Link>
@@ -49,7 +51,7 @@ export default function Card(props){
                             <div className="d-flex justify-content-between align-items-center p-2">
                                 <Link to={'/my-restaurant?resId='+ props.item.mobileNumber}><span style={{color: '#06c167', fontSize: '14px'}} className="card-text">{props.item.name}</span></Link> 
                             </div>
-                            
+
                             <div className="d-flex justify-content-between align-items-center">
                                 <div className="d-flex">
                                     <IconButton className="addToCart" aria-label="add to favorites" onClick={addToCart}>
@@ -67,5 +69,4 @@ export default function Card(props){
                             <PopUp open={open} message={message}/>
                     </div>   
     )
-    
-    }
+}
