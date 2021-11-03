@@ -336,7 +336,7 @@ app.post('/addRestaurantBasicDetail', (req,res)=>{
     let data = [decoded.data.mobileNumber, req.body.restaurantName, req.body.restaurantAddress, req.body.restaurantCity, req.body.restaurantProvience, req.body.restaurantCountry, req.body.restaurantPincode,null, req.body.restaurantDescription, req.body.restaurantType ]
     connection.query ('INSERT INTO UberEats.Restaurants VALUES (?,?,?,?,?,?,?,?,?, ?)', data, (err, results, fields)=>{
         !err? res.send(200):res.json(err);
-    } )
+    } ) 
 })
 //done
 app.post('/addCustomerDetail', (req,res)=>{

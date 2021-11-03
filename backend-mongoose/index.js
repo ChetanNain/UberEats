@@ -115,11 +115,11 @@ app.post("/addRestaurantBasicDetail", async (req, res) => {
   const tokenHeader = req.headers["x-authentication-header"];
   var decoded = jwt.verify(tokenHeader, "my-secret-key-0001xx01212032432");
   // let data = [decoded.data.mobileNumber, req.body.restaurantName, req.body.restaurantAddress, req.body.restaurantCity, req.body.restaurantProvience, req.body.restaurantCountry, req.body.restaurantPincode,null, req.body.restaurantDescription, req.body.restaurantType ]
-  const find = Restaurant.findOne({mobileNumber: decoded.data.mobileNumber})
+  const find = await Restaurant.findOne({mobileNumber: decoded.data.mobileNumber})
   const restObj = {...req.body,
     mobileNumber: decoded.data.mobileNumber};
     console.log(restObj);
-  
+    console.log(find);
   if(find){
     Restaurant.updateOne(
       { mobileNumber: decoded.data.mobileNumber },
@@ -131,8 +131,8 @@ app.post("/addRestaurantBasicDetail", async (req, res) => {
       }
     );
   }else{
-  const restObj = new Restaurant(rest);
-  const data  = await restObj.save();
+  const rest = new Restaurant(restObj);
+  const data  = await rest.save();
   res.status(200).json({data})
   // db.collection("restaurants").insertOne(req.body, function (err, result) {
   //   if (err) throw err;
@@ -147,8 +147,8 @@ app.post("/addRestaurantMenu", async (req, res) => {
   var decoded = jwt.verify(tokenHeader, "my-secret-key-0001xx01212032432");
   let matcher = {mobileNumber: { $eq: decoded.data.mobileNumber } };
 
-  const restaurant = await Restaurant.find(matcher);
-  console.log(restaurant._id);
+  const restaurant = await Restaurant.findOne(matcher);
+  //console.log(restaurant);
   const dish = {
     restaurantMobileNumber: decoded.data.mobileNumber,
     dishName: req.body.dishName,
@@ -172,6 +172,7 @@ app.post("/addRestaurantMenu", async (req, res) => {
         res.json(d);
   } else{
       const data  = await dishObj.save();
+      console.log("Save Data.")
       res.status(200).json({data})
   }
 });
@@ -335,40 +336,71 @@ app.post("/addCustomerDetail", async (req, res) => {
         address: [{address: req.body.address, city: req.body.city, state: req.body.state, country: req.body.country}],
         restFlg : uType
       };
-      db.collection("customers").insertOne(
-        customerObj,
-        function (err, results) {
-          if (err) throw err;
-          if (results) {
-            console.log("Inside third if");
-            const token = jwt.sign(
-              {
-                data: {
-                  fullName: req.body.fullName,
-                  email: req.body.email,
-                  mobileNumber: req.body.mobileNumber,
-                  role: req.body.restFlg,
-                },
-              },
-              "my-secret-key-0001xx01212032432",
-              { expiresIn: "12h" }
-            );
-            res.status(200).json({
-              token: token,
-              msg: "LoggedIn successfully",
-              data: {
-                fullName: req.body.fullName,
-                email: req.body.email,
-                mobileNumber: req.body.mobileNumber,
-                role: uType,
-              },
-            });
-          } else {
-            console.log("Inside second else");
-            res.status(400).json({ msg: "Unable to register" });
-          }
-        }
-      );
+      const newCustomer = new Customers(customerObj);
+      const data = newCustomer.save();
+      if(data){
+        console.log("Inside third if");
+        const token = jwt.sign(
+          {
+            data: {
+              fullName: req.body.fullName,
+              email: req.body.email,
+              mobileNumber: req.body.mobileNumber,
+              role: req.body.restFlg,
+            },
+          },
+          "my-secret-key-0001xx01212032432",
+          { expiresIn: "12h" }
+        );
+        res.status(200).json({
+          token: token,
+          msg: "LoggedIn successfully",
+          data: {
+            fullName: req.body.fullName,
+            email: req.body.email,
+            mobileNumber: req.body.mobileNumber,
+            role: uType,
+          },
+        });
+      } else {
+        console.log("Inside second else");
+        res.status(400).json({ msg: "Unable to register" });
+      }
+
+      // db.collection("customers").insertOne(
+      //   customerObj,
+      //   function (err, results) {
+      //     if (err) throw err;
+      //     if (results) {
+      //       console.log("Inside third if");
+      //       const token = jwt.sign(
+      //         {
+      //           data: {
+      //             fullName: req.body.fullName,
+      //             email: req.body.email,
+      //             mobileNumber: req.body.mobileNumber,
+      //             role: req.body.restFlg,
+      //           },
+      //         },
+      //         "my-secret-key-0001xx01212032432",
+      //         { expiresIn: "12h" }
+      //       );
+      //       res.status(200).json({
+      //         token: token,
+      //         msg: "LoggedIn successfully",
+      //         data: {
+      //           fullName: req.body.fullName,
+      //           email: req.body.email,
+      //           mobileNumber: req.body.mobileNumber,
+      //           role: uType,
+      //         },
+      //       });
+      //     } else {
+      //       console.log("Inside second else");
+      //       res.status(400).json({ msg: "Unable to register" });
+      //     }
+      //   }
+      // );
     }
   });
 });
@@ -413,9 +445,9 @@ app.get("/cart", verifyToken, async function (req, res) {
   let matcher = {customerMobileNumber: { $eq: decoded.data.mobileNumber } };
   let query =  Cart.find(matcher).populate("dishId").exec();
   var response = await query;
-  console.log("Inside Cart")
+  //console.log("Inside Cart")
   console.log(response)
-  console.log("Inside Cart")
+  //console.log("Inside Cart")
   res.status(200).json(response);
 });
 
@@ -434,11 +466,11 @@ app.get("/orders", async (req, res) => {
 
 app.get("/removeItem/:dishID", (req, res) => {
   var myquery = { _id: req.params.dishID };
-  db.collection("dishes").deleteOne(myquery, function (err, obj) {
+  console.log(req.params.dishID);
+  Dishes.findByIdAndDelete(req.params.dishID, function (err, obj) {
     if (err) throw err;
     res.sendStatus(200);
     console.log("1 document deleted from carts");
-    db.close();
   });
 });
 
@@ -455,9 +487,11 @@ app.get("/customerBasicDetail", verifyToken, async (req, res) => {
   var decoded = jwt.verify(tokenHeader, "my-secret-key-0001xx01212032432");
   const filters = req.body;
   //console.log(decoded.data.mobileNumber);
-  let matcher = { mobileNumber: decoded.data.mobileNumber };
-  let query = Customers.findOne(matcher);
-  var response = await query;
+  console.log(decoded.data.mobileNumber);
+ // let matcher = { mobileNumber: "6692100001"};
+  let query = await Customers.findOne({mobileNumber: decoded.data.mobileNumber});
+  console.log(query);
+  var response = query;
   res.status(200).json(response);
 });
 
@@ -502,7 +536,9 @@ app.post('/login', async (req, res)=>{
   const password = req.body.password;
   const results = await Customers.find({email: mobileNumber})
   //console.log(results)
-  console.log(results[0].restFlg)
+  //console.log("Inside Login");
+  //console.log(results[0].restFlg)
+  //console.log(results);
       if(results.length > 0){
           bcrypt.compare(password, results[0].password, function(err, result){
               if(!err){

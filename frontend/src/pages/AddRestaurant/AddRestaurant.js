@@ -36,8 +36,6 @@ export default class AddRestaurant extends Component {
         this.toggleModal = this.toggleModal.bind(this);
         this.validateBasicFromDetail = this.validateBasicFromDetail.bind(this);
     }
-
-    
     toggleModal(){
         if(this.state.open){
             this.setState({
@@ -74,7 +72,7 @@ export default class AddRestaurant extends Component {
             if(res.data){
                 this.setState({restaurantName:res.data.name, restaurantLocation: res.data.city, restaurantCity: res.data.city, restaurantCountry: res.data.country, restaurantProvience: res.data.provience, restaurantPincode: res.data.pincode, restaurantDescription: res.data.description});
             }
-        })    
+        }) 
     }
 
     async loadMenuItems(){
@@ -438,6 +436,7 @@ export default class AddRestaurant extends Component {
     }
 
     updateExstingMenuItem(id){
+        console.log(id);
         const selectedRecord = this.state.menuItems.filter(item=> item.dishId == id);
         this.setState({open: true, 
             dishName: selectedRecord[0]?.dishName, 
@@ -449,7 +448,6 @@ export default class AddRestaurant extends Component {
             dishDescription: selectedRecord[0].description,
             selectedDishId: selectedRecord[0].dishId
         })
-        
     }
 
     generateMenuList(data){
@@ -461,8 +459,9 @@ export default class AddRestaurant extends Component {
             <span>{data.dishTag || data.mealType}</span>
             <span>{data.dishType}</span>
             <span>{data.dishCategory}</span>
-            <a class="link" onClick={()=>this.updateExstingMenuItem(data.dishId)}>Update</a>
-            <a class="link" onClick={()=>this.removeExstingMenuItem(data.dishId)}>Remove</a>
+            {console.log("Ayush data: " + JSON.stringify(data))}
+            <a class="link" onClick={()=>this.updateExstingMenuItem(data._id)}>Update</a>
+            <a class="link" onClick={()=>this.removeExstingMenuItem(data._id)}>Remove</a>
         </div>
     </div>
     }
