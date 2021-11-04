@@ -20,10 +20,7 @@ export default function Card(props){
             }
         }
         if(flag === 2){
-            setMessage('Dish has been added to the Favorite!');
-        }
-        //console.log(flag);
-        axios.get(`http://${window.location.hostname}:3001/addToCart/` + props.item._id+"?type="+flag, headerConfig)
+            axios.get(`http://${window.location.hostname}:3001/addToCart/` + props.item._id+"?type="+flag, headerConfig)
         .then(
             res => {
                props.refreshCart()
@@ -33,6 +30,22 @@ export default function Card(props){
                 }, 2000)
             }
         )
+            setMessage('Dish has been added to the Favorite!');
+        }else{
+            flag=1;
+            axios.get(`http://${window.location.hostname}:3001/addToCart/` + props.item._id+"?type="+flag, headerConfig)
+        .then(
+            res => {
+               props.refreshCart()
+                setOpen(true);
+                setTimeout(()=>{
+                    setOpen(false);
+                }, 2000)
+            }
+        )
+        }
+        //console.log(flag);
+        
     }
     function addToFavorite(){
         addToCart(2);

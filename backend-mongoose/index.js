@@ -179,13 +179,13 @@ app.post("/addRestaurantMenu", async (req, res) => {
 
 app.get("/addToCart/:dishId", async (req, res) => {
   console.log(req.params.dishId, "params");
-  console.log(req.query);
+  console.log(req.query.type);
   const type = req.query.type || 0;
   
   const tokenHeader = req.headers["x-authentication-header"];
   var decoded = jwt.verify(tokenHeader, "my-secret-key-0001xx01212032432");
   const dish = await Dish.findById(mongoose.Types.ObjectId(req.params.dishId));
-  console.log(dish);
+  //console.log(dish);
   cartData = {
     customerMobileNumber: decoded.data.mobileNumber,
     dishId: req.params.dishId,
@@ -196,7 +196,8 @@ app.get("/addToCart/:dishId", async (req, res) => {
     checkedOut: type,
   };
   const cart = new Cart(cartData);
-  cart.save();
+  const message = await cart.save();
+  //console.log(message);
   res.sendStatus(200);
 });
 
