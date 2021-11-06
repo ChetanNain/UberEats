@@ -436,7 +436,7 @@ app.post("/dishes", async function (req, res) {
     if(req.body.searchQuery) {
       dish = dish.filter(row => {
         const searchArr = [row.dishName?.toLowerCase(), row.city?.toLowerCase(), row.dishTag?.toLowerCase(), row.dishType?.toLowerCase(), row.name?.toLowerCase(), row.dishCategory?.toLowerCase()];
-        return searchArr.includes(req.body.searchQuery.toLowerCase())
+        return searchArr.join(" ").includes(req.body.searchQuery.toLowerCase())
     });
     }
     res.status(200).json(dish);
@@ -455,13 +455,26 @@ app.get("/cart", verifyToken, async function (req, res) {
   const restaurantMobileNumbers = response.map(response1 => {
     return response1.restaurantMobileNumber
   })
+ // console.log("list of Response" , response);
+  const listOfRest = await Restaurant.find({$in : restaurantMobileNumbers});
+ // console.log("List of Restaurant", listOfRest);
 
-  // const listOfRest = Restaurant.find({$in : restaurantMobileNumbers});
-  // response.map(resp => {
-  //   resp.restaurantName = 
-  // })
-  //console.log("Inside Cart")
-  console.log(response)
+
+  const finalObject = response.map(resp => {
+    listOfRest.map(restaurant=>{
+      if(restaurant.mobileNumber == resp.restaurantMobileNumber){
+        console.log("Inside if", restaurant.name)
+        resp.restaurantName = restaurant.name
+        return resp;
+      }
+    })
+    //resp.restaurantName = 
+  })
+
+  console.log("Final Response Object", finalObject);
+
+ // console.log("Inside Cart")
+ // console.log(response)
   //console.log("Inside Cart")
   res.status(200).json(response);
 });
