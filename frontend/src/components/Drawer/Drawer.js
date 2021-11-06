@@ -188,7 +188,7 @@ export default function CustomDrawer(props) {
         }
     }
     axios.get(`http://${window.location.hostname}:3001/logout`, headerConfig).then(res=>{
-      localStorage.setItem("token", res.data.token);
+      //localStorage.setItem("token", res.data.token);
       localStorage.removeItem("role");
       localStorage.removeItem("token");
     })

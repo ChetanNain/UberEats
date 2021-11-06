@@ -163,11 +163,15 @@ app.post("/addRestaurantMenu", async (req, res) => {
 };
   console.log(dish);
   const dishObj = new Dish(dish);
-  const dishId = req.body._id || undefined;
+  const dishId = req.body.dishId || undefined;
   const existingDish = await Dish.findById(dishId);
   if(existingDish){
-        dishObj._id = dishId
-        const d = await dishObj.updateOne();
+    dishObj._id =  dishId
+    const d = await Dish.updateOne({ _id:dishId},
+      {$set: dishObj}
+      );
+
+    //console.log("Existing Dish" , existingDish);
         console.log("Record Updated")
         res.json(d);
   } else{
@@ -184,7 +188,7 @@ app.get("/addToCart/:dishId", async (req, res) => {
   
   const tokenHeader = req.headers["x-authentication-header"];
   var decoded = jwt.verify(tokenHeader, "my-secret-key-0001xx01212032432");
-  const dish = await Dish.findById(mongoose.Types.ObjectId(req.params.dishId));
+  const dish = await Dish.findById(req.params.dishId);
   //console.log(dish);
   cartData = {
     customerMobileNumber: decoded.data.mobileNumber,
@@ -438,7 +442,9 @@ app.post("/dishes", async function (req, res) {
     res.status(200).json(dish);
 });
 
-
+// select dish.dishID as id, dish.dishImage, res.name, res.mobileNumber, dish.dishName, dish.dishPrice as price, 
+// cart.checkedOut from cart, Restaurants as res, Dishes as dish where cart.dishId = dish.dishId and 
+// cart.restaurantMobileNumber = res.mobileNumber and cart.customerMobileNumber=${decoded.data.mobileNumber};
 // need to do as making joins with 3 tables.
 app.get("/cart", verifyToken, async function (req, res) {
   const tokenHeader = req.headers["x-authentication-header"];
@@ -446,6 +452,14 @@ app.get("/cart", verifyToken, async function (req, res) {
   let matcher = {customerMobileNumber: { $eq: decoded.data.mobileNumber } };
   let query =  Cart.find(matcher).populate("dishId").exec();
   var response = await query;
+  const restaurantMobileNumbers = response.map(response1 => {
+    return response1.restaurantMobileNumber
+  })
+
+  // const listOfRest = Restaurant.find({$in : restaurantMobileNumbers});
+  // response.map(resp => {
+  //   resp.restaurantName = 
+  // })
   //console.log("Inside Cart")
   console.log(response)
   //console.log("Inside Cart")

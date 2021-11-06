@@ -21,7 +21,7 @@ export default class AddRestaurant extends Component {
             dishName: '',
             dishPrice: '',
             dishIngredients: '',
-            mealType: 'Brakfast',
+            mealType: 'Breakfast',
             dishCategory: 'Todays Offer',
             dishType:'Veg',
             open: false,
@@ -429,7 +429,7 @@ export default class AddRestaurant extends Component {
         axios.get(`http://${window.location.hostname}:3001/removeItem/${id}`)
         const menuItems = [...this.state.menuItems];
         const index = menuItems.findIndex((menu)=>{
-            return id == menu.id
+            return id == menu._id
         });
         menuItems.splice(index, 1);
         this.setState({menuItems: menuItems})
@@ -437,16 +437,16 @@ export default class AddRestaurant extends Component {
 
     updateExstingMenuItem(id){
         console.log(id);
-        const selectedRecord = this.state.menuItems.filter(item=> item.dishId == id);
+        const selectedRecord = this.state.menuItems.filter(item=> item._id== id);
         this.setState({open: true, 
             dishName: selectedRecord[0]?.dishName, 
             dishPrice: selectedRecord[0]?.dishPrice, 
             dishIngredients: selectedRecord[0].mainIngredients,
-            dishCategory: selectedRecord[0].dishCategory,
-            dishTag: selectedRecord[0].dishTag,
-            dishType: selectedRecord[0].dishType,
-            dishDescription: selectedRecord[0].description,
-            selectedDishId: selectedRecord[0].dishId
+           dishCategory: selectedRecord[0].dishCategory,
+           dishTag: selectedRecord[0].dishTag,
+           dishType: selectedRecord[0].dishType,
+           dishDescription: selectedRecord[0].description,
+           selectedDishId: selectedRecord[0]._id
         })
     }
 
@@ -459,7 +459,6 @@ export default class AddRestaurant extends Component {
             <span>{data.dishTag || data.mealType}</span>
             <span>{data.dishType}</span>
             <span>{data.dishCategory}</span>
-            {console.log("Ayush data: " + JSON.stringify(data))}
             <a class="link" onClick={()=>this.updateExstingMenuItem(data._id)}>Update</a>
             <a class="link" onClick={()=>this.removeExstingMenuItem(data._id)}>Remove</a>
         </div>
@@ -538,12 +537,13 @@ export default class AddRestaurant extends Component {
             dishDescription: this.state.dishDescription,
             dishPrice: this.state.dishPrice,
             dishIngredients: this.state.dishIngredients,
-            mealType: this.state.mealType,
-            dishCategory: this.state.dishCategory,
-            dishType: this.state.dishType,
+            mealType: this.state.mealType || 'Breakfast',
+            dishCategory: this.state.dishCategory || 'Todays Offer',
+            dishType: this.state.dishType || 'Veg',
             restaurantMobileNumber: localStorage.getItem("restaurantMobileNumber"),
             image: this.state.uploadedFile
         }
+        console.log(body);
          axios.post(`http://${window.location.hostname}:3001/addRestaurantMenu`, body, headerConfig).then(response=>{ 
            this.loadMenuItems();
             this.setState({openConfirmation: true, message: 'Dish has been added!',
