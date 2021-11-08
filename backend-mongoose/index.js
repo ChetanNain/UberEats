@@ -36,7 +36,11 @@ const upload = multer({
 //const { request } = require("../backend");
 const saltRounds = 10;
 
-mongoose.connect("mongodb://localhost/UberEats", { useNewUrlParser: true });
+//mongoose.connect("mongodb+srv://admin:<password@123>@cluster0.x1bu5.mongodb.net/UberEats?retryWrites=true&w=majority", { useNewUrlParser: true });
+mongoose.connect("mongodb+srv://admin:password12345@cluster0.x1bu5.mongodb.net/UberEats?retryWrites=true&w=majority",()=>{
+  console.log("Connected to mongodb");
+});
+
 //const customers = require('./schema/Customers');
 //connect the DB
 const db = mongoose.connection;
