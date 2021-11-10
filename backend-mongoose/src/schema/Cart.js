@@ -1,8 +1,6 @@
 var mongoose = require('mongoose');
-//var SchemaTypes = mongoose.Schema.Types;
 
 var Cart = new mongoose.Schema({
-    //_id : mongoose.Obj,
     customerMobileNumber: Number,
     dishId: { type: mongoose.Schema.Types.ObjectId, ref: 'Dishes'},
     restaurantMobileNumber: Number,
@@ -10,6 +8,11 @@ var Cart = new mongoose.Schema({
     itemPrice: Number,
     totalPrice:Number,
     checkedOut: Number,
+    specialInstruction: String,
+    status: {
+        type: Number,
+        default: 0
+    }
 });
   
 module.exports = mongoose.model('Cart', Cart);

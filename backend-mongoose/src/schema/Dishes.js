@@ -1,7 +1,5 @@
 var mongoose = require('mongoose');
-//var SchemaTypes = mongoose.Schema.Types;
 var Dishes = new mongoose.Schema({
-   // _id : mongoose.Schema.ObjectId,
     dishId: Number,
     restaurantMobileNumber: Number,
     dishName: String,

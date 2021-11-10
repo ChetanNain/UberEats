@@ -1,7 +1,6 @@
 var mongoose = require('mongoose');
   
 var Restaurant = new mongoose.Schema({
-    //_id : Number,
     mobileNumber: Number,
     name: String,
     address: String,
