@@ -9,6 +9,10 @@ var Cart = new mongoose.Schema({
     totalPrice:Number,
     checkedOut: Number,
     specialInstruction: String,
+    date: {
+        type: Date,
+        default: new Date().toISOString()
+    },
     status: {
         type: Number,
         default: 0

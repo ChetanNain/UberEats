@@ -37,7 +37,7 @@ async function removeFromCart(req, res) {
 async function checkout(req, res) {
     const tokenHeader = req.headers[AUTHENTICATION_HEADER];
     var decoded = jwt.verify(tokenHeader, SECRET_KEY);
-    await Cart.updateMany({ mobileNumber: decoded.mobileNumber }, { $set: { checkedOut: 1, specialInstruction: req.body.specialInstruction } });
+    await Cart.updateMany({$and: [{mobileNumber: decoded.mobileNumber}, {checkedOut: 0}] }, { $set: { checkedOut: 1, specialInstruction: req.body.specialInstruction, date: new Date().toISOString() } });
     res.sendStatus(200);
 }
 

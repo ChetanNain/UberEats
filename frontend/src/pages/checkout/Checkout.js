@@ -6,20 +6,21 @@ export default function Checkout(props){
 
     const [cartData, setCartData]  = React.useState([]);
     const [open, setOpen] = React.useState(false);
+    const [specialInstruction, setSpecialInstruction] = React.useState('');
     
     let subTotal = 0;
-    cartData.map(item=>{
-        subTotal += item.price
+    cartData.map(item => {
+        subTotal += item.dishId.dishPrice * item.quantity;
     })
     React.useEffect(() => {
         const headerConfig = {
             headers: {
                 'x-authentication-header': localStorage.getItem('token')
-              }
-          }
+                }
+            }
         axios.get(`http://${window.location.hostname}:3001/cart`, headerConfig).then((res) => {
-      const data = res.data.filter(e=> e.checkedOut == 0);
-      setCartData(data);
+        const data = res.data.filter(e=> e.checkedOut === 0);
+        setCartData(data);
     });
     }, [])
 
@@ -29,7 +30,7 @@ export default function Checkout(props){
                 'x-authentication-header': localStorage.getItem('token')
               }
           }
-          axios.get(`http://${window.location.hostname}:3001/checkout`,headerConfig ).then(res=>{
+          axios.post(`http://${window.location.hostname}:3001/checkout`, {specialInstruction: specialInstruction}, headerConfig ).then(res=>{
             setOpen(true);
             setTimeout(()=>{
                 setOpen(false);
@@ -37,10 +38,13 @@ export default function Checkout(props){
             }, 2000)
           })
     }
+
+    function handleSpecialInstructionChange(e){
+       setSpecialInstruction(e.target.value);
+    }
     return (
         <div id="RegisterPage" style={{background: '#F5F5F5'}}>
             <div>
-                <center><button class='btn btn-success w-100' onClick={checkout}>Place Order</button></center>
                 <p style={{borderBottom: '1px solid gray', fontSize:'12px'}} class="py-3">
                     If you are not around when the delivery person arrives, they will leave your order at the door.
                     By Placing your order you agree to take full responsibility to it once delivered.
@@ -48,9 +52,9 @@ export default function Checkout(props){
                 
                 {cartData.map(item=>{
                     return <div class="d-flex justify-content-between">
-                        <p>{item.dishName}</p>
-                        <p>{item.quantity}</p>
-                        <p>$ {item.price}</p>
+                        <p>{item?.dishId?.dishName}</p>
+                        <p>Qnt. {item.quantity}</p>
+                        <p>$ {item?.dishId?.dishPrice} (Per)</p>
                     </div>
                 })} 
             <hr/>
@@ -87,8 +91,11 @@ export default function Checkout(props){
                     <h6>Total</h6>
                     <p>$ {(subTotal + subTotal*0.05 + subTotal*0.01 + subTotal*0.02 + 2.49).toFixed(2)}</p>
                 </div>
-
+                <div>
+                    <input type="text" placeholder="Special Instruction" onChange={handleSpecialInstructionChange}/>
+                </div>
             </div>
+            <center><button class='btn btn-success w-100' onClick={checkout}>Place Order</button></center>
             <PopUp message={"Order Placed"} open={open}/>
         </div>
     )

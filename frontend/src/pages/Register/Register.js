@@ -58,7 +58,7 @@ export default function Register(props) {
         dispatch(stateChangeHandler({ name: "password", value: res.data.password }));
         dispatch(stateChangeHandler({ name: "userType", value: res.data.userType }));
         dispatch(stateChangeHandler({ name: "city", value: res.data.address[0].city }));
-        setProfilePic(`http://${window.location.hostname}:3001/resources/${res.data.favorites}`);
+        setProfilePic(`http://${window.location.hostname}:3001/resources/${res.data.profilePicture}`);
       }
     });
   }

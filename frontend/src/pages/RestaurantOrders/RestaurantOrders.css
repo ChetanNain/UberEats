@@ -2,7 +2,6 @@
     box-shadow: 0 4px 8px 0 rgb(0 0 0 / 20%);
     transition: 0.1s;
     background-color: white;
-    padding: 0 50px;
   }
   
   .orderList:hover {
