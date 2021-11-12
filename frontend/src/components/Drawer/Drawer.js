@@ -131,7 +131,7 @@ export default function CustomDrawer(props) {
 
   function loadCartData(){
     axios.get(`http://${window.location.hostname}:3001/cart`, headerConfig).then((res) => {
-      const data = res.data.filter(e=> e.checkedOut == 0);
+      const data = res.data.filter(e=> e.checkedOut === 0);
       setCartData(data);
     });
   }
@@ -161,8 +161,24 @@ export default function CustomDrawer(props) {
         toggleCart();
       }
     });
+  }
 
-    //call backedn API to remove this item from cart
+  
+  async function updateCart(id, operation) {
+      let arr = [...cartData];
+      const index = arr.findIndex((ele) => {
+        return id === ele._id;
+      });
+      if(operation === 'increase'){
+        arr[index].quantity = arr[index].quantity + 1;
+      }else{
+        arr[index].quantity = arr[index].quantity - 1;
+      }
+      if(arr[index].quantity === 0){
+        return removeItem(id);
+      }
+      await axios.get(`http://${window.location.hostname}:3001/updateCart?quantity=${arr[index].quantity}&id=${id}`);
+      setCartData(arr);
   }
 
   function toggleDrawer(){
@@ -365,7 +381,7 @@ export default function CustomDrawer(props) {
         //action={checkout}
         actionLabel="">
             {cartData.map((cartItem) => {
-              return <CartList cartItem={cartItem} removeItem={removeItem} />;
+              return <CartList cartItem={cartItem} removeItem={removeItem} updateCart={updateCart}/>;
             })}
         <center><Link to='/checkout' onClick={checkout}>
           <button class="btn btn-success">Proceed To checkout</button>

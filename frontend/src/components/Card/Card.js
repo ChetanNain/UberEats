@@ -32,7 +32,7 @@ export default function Card(props){
         )
             setMessage('Dish has been added to the Favorite!');
         }else{
-            flag=1;
+            flag=0;
             axios.get(`http://${window.location.hostname}:3001/addToCart/` + props.item._id+"?type="+flag, headerConfig)
         .then(
             res => {
@@ -53,7 +53,7 @@ export default function Card(props){
 
     return(
     <div className="cardBody">
-            <Link to={'/my-restaurant?resId='+ props.item.mobileNumber}><img className="card-img-top" src={imageURL} alt="Card image cap" /></Link>
+            <Link to={'/my-restaurant?resId='+ props.item.restaurantMobileNumber}><img className="card-img-top" src={imageURL} alt="Card image cap" /></Link>
                 <div className="card-body">
                 <h5 className="card-title">{props.item.restaurant}</h5>
                             <div className="d-flex justify-content-between align-items-center p-2">
