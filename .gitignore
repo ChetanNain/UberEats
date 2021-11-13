@@ -5,5 +5,6 @@ frontend/node_modules
 frontend/src/pages/profile/profile.css
 frontend/src/pages/profile/profile.css
 frontend/src/pages/profile/profile.css
+kafka-backend/node_modules
 *.zip
 *.md
