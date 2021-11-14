@@ -9,8 +9,10 @@ import PopUp from '../../components/Popup/Popup';
 import {Link} from 'react-router-dom';
 
 export default function Card(props){
+  //  console.log(props)
     const [open, setOpen] = useState(false);
-    const imageURL = `http://${window.location.hostname}:3001/resources/${props.item.dishImage}`;
+    //const imageURL = `http://${window.location.hostname}:3001/resources/${props.item.dishImage}`;
+    const imageURL = `http://${window.location.hostname}:3001` + props.item.dishImage;
     const [message, setMessage] = useState('Dish has been added to the cart!');
 
     var addToCart = (flag)=>{
@@ -56,14 +58,17 @@ export default function Card(props){
             <Link to={'/my-restaurant?resId='+ props.item.restaurantMobileNumber}><img className="card-img-top" src={imageURL} alt="Card image cap" /></Link>
                 <div className="card-body">
                 <h5 className="card-title">{props.item.restaurant}</h5>
+                            {console.log("restaurant details", props.item)}
                             <div className="d-flex justify-content-between align-items-center p-2">
                                     <span className="card-text">{props.item.dishName}</span> 
                                      <span className="card-text">{props.item.dishPrice || props.item.itemPrice+ '$'}</span>
                             </div>
-
+                            <div className="d-flex justify-content-between align-items-center p-2">
+                                    <span className="card-text">{props.item.restaurantId.name}</span> 
+                            </div>
                             <div className="d-flex justify-content-between align-items-center p-2">
                                 <Link to={'/my-restaurant?resId='+ props.item.mobileNumber}><span style={{color: '#06c167', fontSize: '14px'}} className="card-text">{props.item.name}</span></Link> 
-                            </div>
+                            </div> 
 
                             <div className="d-flex justify-content-between align-items-center">
                                 <div className="d-flex">

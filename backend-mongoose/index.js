@@ -84,7 +84,7 @@ app.post("/checkout", UserController.checkout);
 app.post("/updateOrderStatus", UserController.updateOrderStatus);
 app.get("/restaurantDishes", RestaurantController.restaurantDishes)
 app.post("/addCustomerDetail", UserController.addUser);
-//app.post("/dishes", DishController.getDishes);
+app.post("/dishes", DishController.getDishes);
 //app.get("/cart", verifyToken, UserController.getCart);
 app.get("/orders", UserController.getOrders);
 app.get("/removeItem/:dishID", DishController.removeDish);
@@ -102,25 +102,26 @@ app.get("/logout", UserController.logout);
 
 
 
-app.post('/dishes', function(req, res){
-  kafka.make_request('get_dishes',req.body, function(err,results){
-      console.log('in result');
-     // console.log(results);
-      if (err){
-          console.log(err)
-          console.log("Inside err");
-          res.json({ 
-              status:"error",
-              msg:"System Error, Try Again."
-          })
-      }else{
-          console.log("Inside else");
-              res.json(results);
-              res.end();
-          }
+// app.post('/dishes', function(req, res){
+//   kafka.make_request('get_dishes',req.body, function(err,results){
+//       console.log("results",results);
+//       console.log('in result');
+//      // console.log(results);
+//       if (err){
+//           console.log(err)
+//           console.log("Inside err");
+//           res.json({ 
+//               status:"error",
+//               msg:"System Error, Try Again."
+//           })
+//       }else{
+//           console.log("Inside else");
+//               res.json(results);
+//               res.end();
+//           }
       
-  });
-});
+//   });
+// });
 
 
 app.get('/cart', function(req, res){
@@ -134,7 +135,7 @@ app.get('/cart', function(req, res){
       
     console.log('in result');
 
-      console.log(results);
+      //console.log(results);
       if (err){
           console.log(err)
           console.log("Inside err of cart");

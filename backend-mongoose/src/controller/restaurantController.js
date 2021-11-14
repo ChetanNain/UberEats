@@ -84,8 +84,9 @@ async function restaurantDishes(req, res) {
     
     if (tokenHeader != "null") {
         var decoded = jwt.verify(tokenHeader, SECRET_KEY);
+        const mobileNumber = req.query.restaurandId ? req.query.restaurandId : decoded.data.mobileNumber;
         try {
-        var restaurantMobileNumber = { restaurantMobileNumber: decoded.data.mobileNumber };
+        var restaurantMobileNumber = { restaurantMobileNumber: mobileNumber };
         const restaurant = await Dish.find(restaurantMobileNumber);
         res.json(restaurant);
         } catch (err) {

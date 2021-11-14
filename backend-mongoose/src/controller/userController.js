@@ -9,6 +9,8 @@ const bcrypt = require("bcrypt");
 const SECRET_KEY = "my-secret-key-0001xx01212032432";
 const AUTHENTICATION_HEADER = "x-authentication-header";
 
+const SALT_ROUNTD = 10;
+
 async function addToCart(req, res) {
     const type = req.query.type || 0;
     const tokenHeader = req.headers[AUTHENTICATION_HEADER];
@@ -42,6 +44,8 @@ async function checkout(req, res) {
 }
 
 async function updateOrderStatus(req, res) {
+    console.log("orderId", req.body.orderId);
+    console.log("orderStatus", req.body.orderStatus);
     await Cart.updateOne({ _id: req.body.orderId }, { $set: { status: req.body.orderStatus } });
     res.sendStatus(200);
 }
