@@ -145,7 +145,13 @@ async function getCart(req, res) {
 async function getOrders(req, res){
     const tokenHeader = req.headers[AUTHENTICATION_HEADER];
     var decoded = jwt.verify(tokenHeader, SECRET_KEY);
-    const response = await Cart.find({mobileNumber: decoded.mobileNumber , checkedOut: 1}).populate("dishId").exec();
+    console.log("decoded",decoded.data.mobileNumber)
+    let response= await Cart.find({customerMobileNumber: decoded.data.mobileNumber , checkedOut: 1})
+    if(decoded.data.role===0){
+        response = await Cart.find({customerMobileNumber: decoded.data.mobileNumber , checkedOut: 1})//.populate("dishId").exec();
+    }else{
+        response = await Cart.find({restaurantMobileNumber: decoded.data.mobileNumber , checkedOut: 1})//.populate("dishId").exec();
+    }
     res.json(response);
   }
 

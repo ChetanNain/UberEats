@@ -5,7 +5,7 @@ export default function RestaurantOrders() {
   async function UpdateOrderStatus(id, e) {
     const data = {
       orderStatus: e.target.value,
-      orderID: id,
+      orderId: id,
     };
     console.log("data", data);
     await axios.post(
