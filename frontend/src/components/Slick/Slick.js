@@ -46,7 +46,6 @@ export default class SimpleSlider extends React.Component {
 
   render() {
     return (
-
       <div className="App">
       <div className="slider-wrapper">
       <p style={{fontSize: '16px', fontWeight: 600}}>{this.props.slickHeading}</p>

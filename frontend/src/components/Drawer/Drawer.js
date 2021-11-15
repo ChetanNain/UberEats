@@ -132,6 +132,7 @@ export default function CustomDrawer(props) {
   function loadCartData(){
     axios.get(`http://${window.location.hostname}:3001/cart`, headerConfig).then((res) => {
       const data = res.data.filter(e=> e.checkedOut === 0);
+      
       setCartData(data);
     });
   }
@@ -142,7 +143,7 @@ export default function CustomDrawer(props) {
       dispatch(updateDishes(res.data));
     })
   }
-
+ 
   function toggleCart(){
     setOpenCart(!openCartVal);
   }
@@ -151,13 +152,17 @@ export default function CustomDrawer(props) {
     const data = { itemId: id };
     axios.post(`http://${window.location.hostname}:3001/removeFromCart`, data).then((res) => {
       //setCartData(res.data);
-      let arr = [...cartData];
-      const index = arr.findIndex((ele) => {
-        return id === ele.id;
-      });
-      arr.splice(index, 1);
-      setCartData(arr);
-      if (arr.length == 0) {
+      // let arr = [...cartData];
+      // const index = arr.findIndex((ele) => {
+      //   return id === ele.id;
+      // });
+      // arr.splice(index, 1);
+      // setCartData(arr);
+      // if (arr.length == 0) {
+      //   toggleCart();
+      // }
+      loadCartData()
+      if (cartData.length == 0) {
         toggleCart();
       }
     });

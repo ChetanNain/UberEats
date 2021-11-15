@@ -5,9 +5,9 @@ const Restaurant = require("../schema/Restaurant")
 
 
 async function handle_request(req, callback){
-    console.log(req)
+    //console.log(req)
     let matcher = { customerMobileNumber: { $eq: req.mobileNumber } }
-    console.log("matcher",matcher);
+    //console.log("matcher",matcher);
     let query = Cart.find(matcher).populate("dishId").exec();
     //console.log("cart request", req);
     var response = await query;

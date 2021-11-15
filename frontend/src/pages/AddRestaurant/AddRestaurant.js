@@ -471,7 +471,6 @@ export default class AddRestaurant extends Component {
         dishForm.splice(id - 1, 1);
         dishFormData.splice(id - 1, 1)
         this.setState({dishForm: dishForm, dishFormData: dishFormData})
-
     }
 
     handleCountryChange(e){

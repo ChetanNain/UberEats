@@ -79,7 +79,8 @@ return(
     <div>
     <Carousel style={{height: '300px'}}>
       {data.map(carousal=>{
-          const dishImage = `http://${window.location.hostname}:3001/resources/${carousal.dishImage}`;
+          const dishImage = `http://${window.location.hostname}:3001${carousal.dishImage}`;
+          //const dishImage = `http://${window.location.hostname}:3001/resources/${carousal.dishImage}`;
             return <Carousel.Item style={{height: '300px'}}>
             <img
               className="d-block w-100"

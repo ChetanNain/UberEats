@@ -1,5 +1,6 @@
 var connection =  new require('./kafka/Connection');
 const mongoose = require("mongoose");
+const { addUser } = require("../backend-mongoose/src/controller/userController.js");
 mongoose.connect("mongodb+srv://admin:password12345@cluster0.x1bu5.mongodb.net/UberEats?retryWrites=true&w=majority",(err)=>{
   if(!err){
     console.log("Connected to mongodb");
@@ -12,6 +13,8 @@ mongoose.connect("mongodb+srv://admin:password12345@cluster0.x1bu5.mongodb.net/U
 var Books = require('./services/books.js');
 var Dishes = require('./services/dishes.js');
 var GetCart = require('./services/getCart.js');
+var AddUser = require('./services/addUser.js');
+var Checkout = require('./services/checkout.js');
 
 function handleTopicRequest(topic_name,fname){
     //var topic_name = 'root_topic';
@@ -48,3 +51,5 @@ function handleTopicRequest(topic_name,fname){
 handleTopicRequest("post_book",Books)
 handleTopicRequest("get_dishes",Dishes)
 handleTopicRequest("get_cart",GetCart)
+handleTopicRequest("add_user",AddUser)
+handleTopicRequest("checkout",Checkout)

@@ -67,7 +67,7 @@ async function addUser(req, res) {
             mobileNumber: req.body.mobileNumber,
             password: hash,
             profilePicture: req.body.uploadedFile,
-            address: [{ address: req.body.address, city: req.body.city, state: req.body.state, country: req.body.country }]
+            address: [{ address: req.body.address, city: req.body.city, state: req.body.provience, country: req.body.country }]
         };
         if (customer) {
             Customers.updateOne(
