@@ -47,7 +47,6 @@ export default function Checkout(props) {
           setOpen(false);
 
           //   var dummy = [];
-          setCartData([]);
         }, 2000);
       });
   }

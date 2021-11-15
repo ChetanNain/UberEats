@@ -33,7 +33,7 @@ export default function Register(props) {
           'x-authentication-header': localStorage.getItem('token')
         }
     }
-    loadBasicDetails();
+      loadBasicDetails();
     axios.get(`http://${window.location.hostname}:3001/cart`, headerConfig).then((res) => {
       setCartData(res.data);
     });
@@ -47,10 +47,11 @@ export default function Register(props) {
     }
     axios.get(`http://${window.location.hostname}:3001/customerBasicDetail`, headerConfig).then((res) => {
       if (res.data) {
+        console.log("Response Data", res.data);
         dispatch(stateChangeHandler({ name: "fullName", value: res.data.fullName }));
         dispatch(stateChangeHandler({ name: "mobileNumber", value: res.data.mobileNumber }));
-        dispatch(stateChangeHandler({ name: "country", value: res.data.country }));
-        dispatch(stateChangeHandler({ name: "provience", value: res.data.state }));
+        dispatch(stateChangeHandler({ name: "country", value: res.data.address[0].country || "United States" }));
+        dispatch(stateChangeHandler({ name: "provience", value: res.data.address[0].state || "CA"}));
         dispatch(stateChangeHandler({ name: "address", value: res.data.address[0].address }));
         dispatch(stateChangeHandler({ name: "email", value: res.data.email }));
         dispatch(stateChangeHandler({ name: "dateOfBirth", value: res.data.dateOfBirth }));

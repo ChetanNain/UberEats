@@ -13,6 +13,6 @@ async function handle_request(req, callback){
     callback(null, {status:200});
 
     
-};
+};  
  
 exports.handle_request = handle_request;

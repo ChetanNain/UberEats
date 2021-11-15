@@ -86,7 +86,7 @@ async function handle_request(req, callback){
                     },
                 }
                 console.log("==============================================6", response);
-                callback(null, {status: 200,response});
+                            
             }
         }
     });

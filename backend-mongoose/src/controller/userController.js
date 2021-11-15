@@ -12,6 +12,7 @@ const AUTHENTICATION_HEADER = "x-authentication-header";
 const SALT_ROUNTD = 10;
 
 async function addToCart(req, res) {
+    console.log("req.query", req.query.type)
     const type = req.query.type || 0;
     const tokenHeader = req.headers[AUTHENTICATION_HEADER];
     var decoded = jwt.verify(tokenHeader, SECRET_KEY);
@@ -23,7 +24,7 @@ async function addToCart(req, res) {
         quantity: 1,
         itemPrice: parseFloat(dish.dishPrice),
         totalPrice: dish.dishPrice * 1,
-        checkedOut: type,
+        checkedOut: req.query.type,
     };
     const cart = new Cart(cartData);
     await cart.save();
@@ -52,6 +53,8 @@ async function updateOrderStatus(req, res) {
 
 
 async function addUser(req, res) {
+
+    console.log("reqeust body",req.body)
     bcrypt.hash(req.body.password, SALT_ROUNTD, async function (err, hash) {
         let uType = 0;
         if (req.body.userType == "Restaurant") {
@@ -85,7 +88,7 @@ async function addUser(req, res) {
                 email: req.body.email,
                 mobileNumber: req.body.mobileNumber,
                 password: hash,
-                address: [{ address: req.body.address, city: req.body.city, state: req.body.state, country: req.body.country }],
+                address: [{ address: req.body.address, city: req.body.city, state: req.body.provience, country: req.body.country }],
                 restFlg: uType
             };
             const newCustomer = new Customers(customerObj);
@@ -142,7 +145,7 @@ async function getCart(req, res) {
 async function getOrders(req, res){
     const tokenHeader = req.headers[AUTHENTICATION_HEADER];
     var decoded = jwt.verify(tokenHeader, SECRET_KEY);
-    const response = await Cart.find({mobileNumber: decoded.mobileNumber}).populate("dishId").exec();
+    const response = await Cart.find({mobileNumber: decoded.mobileNumber , checkedOut: 1}).populate("dishId").exec();
     res.json(response);
   }
 
