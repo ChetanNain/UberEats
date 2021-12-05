@@ -31,12 +31,14 @@ import axios from "axios";
 import CartList from '../../pages/CartList/CartList'
 import LogoutIcon from '@mui/icons-material/Logout';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
-import { useSelector, useDispatch } from 'react-redux';
 import Checkout from '../../pages/checkout/Checkout';
 import { handleFilterChange, updateDishes, handleClearFilter } from '../../redux/reducers/masterData';
 import SearchIcon from '@mui/icons-material/Search';
 import { useHistory } from 'react-router-dom';
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { GET_DISHES } from '../../graphQL/query';
+import { useQuery, useMutation, useLazyQuery, gql } from '@apollo/client';
 
 const drawerWidth = 240;
 
@@ -112,6 +114,7 @@ export default function CustomDrawer(props) {
     {to: '/my-restaurant', name: "Restaurant Homepage", icon: <HomeWorkIcon />, role: 1}
 ]);
   let filters = useSelector((state) => state.masterData.filters);
+  const [loadDishes, { loadingDishes, dishes }] = useLazyQuery(GET_DISHES);
 
   const headerConfig = {
     headers: {
@@ -125,23 +128,21 @@ export default function CustomDrawer(props) {
   }
 
   useEffect(() => {
-   loadCartData();
     loadDishData();
-  }, []);
+    loadCartData();
+  }, [])
+
 
   function loadCartData(){
     axios.get(`http://${window.location.hostname}:3001/cart`, headerConfig).then((res) => {
       const data = res.data.filter(e=> e.checkedOut === 0);
-      
       setCartData(data);
     });
   }
 
 
   function loadDishData(){
-    axios.post(`http://${window.location.hostname}:3001/dishes`, filters, headerConfig).then(res=>{
-      dispatch(updateDishes(res.data));
-    })
+    loadDishes({variables: {searchQuery: "breakfast"}});
   }
  
   function toggleCart(){
