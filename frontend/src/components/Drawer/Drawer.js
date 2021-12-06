@@ -37,8 +37,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import { useHistory } from 'react-router-dom';
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { GET_DISHES } from '../../graphQL/query';
-import { useQuery, useMutation, useLazyQuery, gql } from '@apollo/client';
+import { GET_DISHES, GET_CART } from  '../../graphQL/query';
 
 const drawerWidth = 240;
 
@@ -114,7 +113,6 @@ export default function CustomDrawer(props) {
     {to: '/my-restaurant', name: "Restaurant Homepage", icon: <HomeWorkIcon />, role: 1}
 ]);
   let filters = useSelector((state) => state.masterData.filters);
-  const [loadDishes, { loadingDishes, dishes }] = useLazyQuery(GET_DISHES);
 
   const headerConfig = {
     headers: {
@@ -132,17 +130,28 @@ export default function CustomDrawer(props) {
     loadCartData();
   }, [])
 
-
+  // function loadCartData(){
+  //   axios.get(`http://${window.location.hostname}:3001/cart`, headerConfig).then((res) => {
+  //     const data = res.data.filter(e=> e.checkedOut === 0);
+  //     setCartData(data);
+  //   });
+  // }
   function loadCartData(){
-    axios.get(`http://${window.location.hostname}:3001/cart`, headerConfig).then((res) => {
-      const data = res.data.filter(e=> e.checkedOut === 0);
-      setCartData(data);
-    });
+    axios.post(`http://${window.location.hostname}:4000/graphql`, {
+      query: GET_CART
+    }, headerConfig).then(res=>{
+      setCartData(res.data.data.getCart ? res.data.data.getCart : []);
+    })
   }
 
 
   function loadDishData(){
-    loadDishes({variables: {searchQuery: "breakfast"}});
+    axios.post(`http://${window.location.hostname}:4000/graphql`, {
+      query: GET_DISHES,
+      variables: filters
+    }, headerConfig).then(res=>{
+      dispatch(updateDishes(res.data.data.getDishes));
+    })
   }
  
   function toggleCart(){

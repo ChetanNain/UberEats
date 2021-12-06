@@ -15,7 +15,6 @@ export class Home extends Component {
   }
 
   render() {
-    console.log(this.props.applyFilter, "hello");
     return (
       <div>
         <SimpleSlider

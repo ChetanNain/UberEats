@@ -1,8 +1,33 @@
-import { gql } from '@apollo/client';
+const GET_DISHES = `query getDishes($searchQuery: String) {
+  getDishes(searchQuery: $searchQuery) {
+    restaurantMobileNumber
+    dishName
+    mainIngredients
+    dishImage
+    dishPrice
+    description
+    dishCategory
+    dishTag
+    dishType
+    restaurantId {
+      mobileNumber
+      name
+      city
+      provience
+      pincode
+      description
+      restaurantType
+    }
+  }
+}
+`;
 
-const GET_DISHES = gql`
-  query getDishes ($searchQuery: String) {
-      getDishes(searchQuery: $searchQuery) {
+const GET_CART = `query getCart {
+  getCart {
+      customerMobileNumber
+      dishId {
+        dishId
+        restaurantMobileNumber
         dishName
         mainIngredients
         dishImage
@@ -10,14 +35,21 @@ const GET_DISHES = gql`
         description
         dishCategory
         dishTag
-        dishType
-        restaurantId {
-          name,
-        }
-      }
+        dishType  
+      },
+      restaurantMobileNumber
+      quantity
+      itemPrice
+      totalPrice
+      checkedOut
+      specialInstruction
+      date
+      status
     }
+}
 `;
 
 export {
-    GET_DISHES
+    GET_DISHES,
+    GET_CART
 }

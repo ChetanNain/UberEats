@@ -7,22 +7,13 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { Provider } from 'react-redux'
 import store from '../src/redux/store/store';
 import { BrowserRouter } from 'react-router-dom';
-import { ApolloProvider, ApolloClient, InMemoryCache } from "@apollo/client";
-
-const client = new ApolloClient({
-  uri: "https://api.spacex.land/graphql/",
-  cache: new InMemoryCache()
-});
-
 
 ReactDOM.render(
-  <ApolloProvider client={client}>
   <Provider store={store}>
     <BrowserRouter>
       <App />
   </BrowserRouter>
-</Provider> 
-</ApolloProvider>,
+</Provider>,
 
 
   document.getElementById('root')

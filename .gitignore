@@ -1,6 +1,7 @@
-
+backend-GraphQL/node_modules
 backend/node_modules
 backend-mongoose/node_modules
+frontend-mongoose/node_modules
 frontend/node_modules
 frontend/src/pages/profile/profile.css
 frontend/src/pages/profile/profile.css
