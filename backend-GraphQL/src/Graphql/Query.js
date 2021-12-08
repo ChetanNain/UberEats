@@ -37,13 +37,14 @@ const query = new GraphQLObjectType({
                 return await UserController.getCart(context);
             }
         },
-        
-    } 
+        getOrders:{
+            type: new GraphQLList(Cart),
+            resolve: async (parent, args, context) => {
+                return await UserController.getOrders(context);
+            }
+        }
+    }
 });
-
-
-
-
 
 module.exports = {
     query

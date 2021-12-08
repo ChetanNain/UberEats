@@ -6,13 +6,16 @@ const Customer = new GraphQLObjectType({
         fullName: {type: GraphQLString},
         dateOfBirth: {type: GraphQLString},
         email: {type: GraphQLString},
-        mobileNumber:  {type: GraphQLInt},
+        mobileNumber:  {type: GraphQLString},
         password: {type: GraphQLString},
         favorites:   {type: new GraphQLList(GraphQLInt)},
         profilePicture: {type: GraphQLString},
         language: {type: GraphQLString},
         restFlg: {type: GraphQLInt},
-        address: {type: new GraphQLList(GraphQLString)}
+        address: {type: new GraphQLList(GraphQLString)},
+        city: {type: GraphQLString },
+        state: {type: GraphQLString },
+        country: {type: GraphQLString }
     })
 });
 

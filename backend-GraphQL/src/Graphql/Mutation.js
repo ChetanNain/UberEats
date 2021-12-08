@@ -9,9 +9,25 @@ const mutation = new GraphQLObjectType({
     fields: {
         register: {
             type: Customer,
-            args: {},
-            resolve(parent, args){
-                return Customer;
+            args: { 
+                fullName: {type: GraphQLString},
+                dateOfBirth: {type: GraphQLString},
+                email: {type: GraphQLString},
+                mobileNumber:  {type: GraphQLString},
+                password: {type: GraphQLString},
+                favorites:   {type: new GraphQLList(GraphQLInt)},
+                profilePicture: {type: GraphQLString},
+                language: {type: GraphQLString},
+                restFlg: {type: GraphQLInt},
+                userType: {type: GraphQLString },
+                uploadedFile:  { type: GraphQLString },
+                address: {type: GraphQLString },
+                city: {type: GraphQLString },
+                state: {type: GraphQLString },
+                country: {type: GraphQLString }
+        },
+            resolve: async (parent, args) =>{
+                return await UserController.addUser(args);
             }
         }
     }

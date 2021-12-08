@@ -52,8 +52,9 @@ async function updateOrderStatus(req, res) {
 }
 
 
-async function addUser(req, res) {
-
+async function addUser(args) {
+    let req = {};
+    req.body = {...args};
     console.log("reqeust body",req.body)
     bcrypt.hash(req.body.password, SALT_ROUNTD, async function (err, hash) {
         let uType = 0;
@@ -78,7 +79,7 @@ async function addUser(req, res) {
                 { $set: customerObj },
                 function (err, result) {
                     if (err) throw err;
-                    res.sendStatus(200);
+                   return true;
                 }
             );
         } else {
@@ -106,16 +107,12 @@ async function addUser(req, res) {
                     SECRET_KEY,
                     { expiresIn: "12h" }
                 );
-                res.status(200).json({
-                    token: token,
-                    msg: "LoggedIn successfully",
-                    data: {
+                return {
                         fullName: req.body.fullName,
                         email: req.body.email,
                         mobileNumber: req.body.mobileNumber,
                         role: uType,
-                    },
-                });
+                    }
             }
         }
     });
@@ -142,8 +139,8 @@ async function getCart(context) {
     return response;
 }
 
-async function getOrders(req, res){
-    const tokenHeader = req.headers[AUTHENTICATION_HEADER];
+async function getOrders(context){
+    const tokenHeader = context.headers[AUTHENTICATION_HEADER];
     var decoded = jwt.verify(tokenHeader, SECRET_KEY);
     console.log("decoded",decoded.data.mobileNumber)
     let response= await Cart.find({customerMobileNumber: decoded.data.mobileNumber , checkedOut: 1})
@@ -152,7 +149,7 @@ async function getOrders(req, res){
     }else{
         response = await Cart.find({restaurantMobileNumber: decoded.data.mobileNumber , checkedOut: 1})//.populate("dishId").exec();
     }
-    res.json(response);
+    return response;
   }
 
   async function getCustomerBasicDetail(req, res){

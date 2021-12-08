@@ -1,8 +1,6 @@
 import React from "react";
 import axios from "axios";
 import "./RestaurantOrders.css";
-import { GET_ORDERS } from "../../graphQL/query";
-
 export default function RestaurantOrders() {
   async function UpdateOrderStatus(id, e) {
     const data = {
@@ -17,12 +15,6 @@ export default function RestaurantOrders() {
     alert("Status Updated");
     reload();
   }
-
-  const headerConfig = {
-    headers: {
-        'x-authentication-header': localStorage.getItem('token')
-      }
-  }
   const [orders, setOrders] = React.useState([]);
   const [recordPerPage, setRecordPerPage] = React.useState(5);
   const [startIndex, setStartIndex] = React.useState(0);
@@ -34,28 +26,18 @@ export default function RestaurantOrders() {
     loadOrder();
   }, [refresh]);
 
-  // function loadOrder() {
-  //   const headerConfig = {
-  //     headers: {
-  //       "x-authentication-header": localStorage.getItem("token"),
-  //     },
-  //   };
-  //   axios
-  //     .get(`http://${window.location.hostname}:3001/orders`, headerConfig)
-  //     .then((res) => {
-  //       setOrders(res.data);
-  //     });
-  // }
-
-
-  function loadOrder(){
-    axios.post(`http://${window.location.hostname}:4000/graphql`, {
-      query: GET_ORDERS
-    }, headerConfig).then(res=>{
-      setOrders(res.data.data.getOrders ? res.data.data.getOrders : []);
-    })
+  function loadOrder() {
+    const headerConfig = {
+      headers: {
+        "x-authentication-header": localStorage.getItem("token"),
+      },
+    };
+    axios
+      .get(`http://${window.location.hostname}:3001/orders`, headerConfig)
+      .then((res) => {
+        setOrders(res.data);
+      });
   }
-
   async function cancelOrder(id) {
     await axios.post(
       `http://${window.location.hostname}:3001/updateOrderStatus`,

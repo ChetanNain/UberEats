@@ -49,7 +49,33 @@ const GET_CART = `query getCart {
 }
 `;
 
+const GET_ORDERS = `query getOrders{
+  getOrders {
+    customerMobileNumber
+    dishId {
+      dishId
+      restaurantMobileNumber
+      dishName
+      mainIngredients
+      dishImage
+      dishPrice
+      description
+      dishCategory
+      dishTag
+      dishType  
+    },
+    restaurantMobileNumber
+    quantity
+    itemPrice
+    totalPrice
+    checkedOut
+    specialInstruction
+    date
+    status
+  }
+}`;
 export {
     GET_DISHES,
-    GET_CART
+    GET_CART,
+    GET_ORDERS
 }
