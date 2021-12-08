@@ -131,7 +131,7 @@ export default function CustomDrawer(props) {
   }, [])
 
   // function loadCartData(){
-  //   axios.get(`http://${window.location.hostname}:3001/cart`, headerConfig).then((res) => {
+  //   axios.get(`http://${window.location.hostname}:4000/cart`, headerConfig).then((res) => {
   //     const data = res.data.filter(e=> e.checkedOut === 0);
   //     setCartData(data);
   //   });
@@ -160,7 +160,7 @@ export default function CustomDrawer(props) {
 
   function removeItem(id) {
     const data = { itemId: id };
-    axios.post(`http://${window.location.hostname}:3001/removeFromCart`, data).then((res) => {
+    axios.post(`http://${window.location.hostname}:4000/removeFromCart`, data).then((res) => {
       //setCartData(res.data);
       // let arr = [...cartData];
       // const index = arr.findIndex((ele) => {
@@ -192,7 +192,7 @@ export default function CustomDrawer(props) {
       if(arr[index].quantity === 0){
         return removeItem(id);
       }
-      await axios.get(`http://${window.location.hostname}:3001/updateCart?quantity=${arr[index].quantity}&id=${id}`);
+      await axios.get(`http://${window.location.hostname}:4000/updateCart?quantity=${arr[index].quantity}&id=${id}`);
       setCartData(arr);
   }
 
@@ -207,7 +207,7 @@ export default function CustomDrawer(props) {
           'x-authentication-header': localStorage.getItem('token')
         }
     }
-    axios.get(`http://${window.location.hostname}:3001/checkout`,headerConfig ).then(res=>{
+    axios.get(`http://${window.location.hostname}:4000/checkout`,headerConfig ).then(res=>{
       toggleCart();
     }) */
   }
@@ -218,11 +218,12 @@ export default function CustomDrawer(props) {
           'x-authentication-header': localStorage.getItem('token')
         }
     }
-    axios.get(`http://${window.location.hostname}:3001/logout`, headerConfig).then(res=>{
-      //localStorage.setItem("token", res.data.token);
       localStorage.removeItem("role");
       localStorage.removeItem("token");
-    })
+    // axios.get(`http://${window.location.hostname}:4000/logout`, headerConfig).then(res=>{
+    //   //localStorage.setItem("token", res.data.token);
+      
+    // })
     setCartData([])
     forceRender();
   }

@@ -9,10 +9,10 @@ import PopUp from '../../components/Popup/Popup';
 import {Link} from 'react-router-dom';
 
 export default function Card(props){
-  //  console.log(props)
+   console.log(props, "Props")
     const [open, setOpen] = useState(false);
-    //const imageURL = `http://${window.location.hostname}:3001/resources/${props.item.dishImage}`;
-    const imageURL = `http://${window.location.hostname}:3001` + props.item.dishImage;
+    //const imageURL = `http://${window.location.hostname}:4000/resources/${props.item.dishImage}`;
+    const imageURL = `http://${window.location.hostname}:4000/resources/` + props.item.dishImage;
     const [message, setMessage] = useState('Dish has been added to the cart!');
 
     var addToCart = (flag)=>{
@@ -22,7 +22,7 @@ export default function Card(props){
             }
         }
         if(flag === 2){
-            axios.get(`http://${window.location.hostname}:3001/addToCart/` + props.item._id+"?type="+flag, headerConfig)
+            axios.get(`http://${window.location.hostname}:4000/addToCart/` + props.item._id+"?type="+flag, headerConfig)
         .then(
             res => {
                props.refreshCart()
@@ -35,7 +35,7 @@ export default function Card(props){
             setMessage('Dish has been added to the Favorite!');
         }else{
             flag=0;
-            axios.get(`http://${window.location.hostname}:3001/addToCart/` + props.item._id+"?type="+flag, headerConfig)
+            axios.get(`http://${window.location.hostname}:4000/addToCart/` + props.item._id+"?type="+flag, headerConfig)
         .then(
             res => {
                props.refreshCart()
@@ -81,7 +81,7 @@ export default function Card(props){
                                     </IconButton>
                                 </div>  
  
-                                {props.item.dishTag =='Veg' ? <CircleIcon style={{color: 'green', fontSize: '20px', right: 0}}/> : <CircleIcon style={{color: 'red', fontSize: '20px'}}/>}
+                                {/* {props.item.dishTag =='Veg' ? <CircleIcon style={{color: 'green', fontSize: '20px', right: 0}}/> : <CircleIcon style={{color: 'red', fontSize: '20px'}}/>} */}
                             </div>
                             </div>
                             <PopUp open={open} message={message}/>

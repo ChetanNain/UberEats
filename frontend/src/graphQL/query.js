@@ -1,5 +1,6 @@
 const GET_DISHES = `query getDishes($searchQuery: String) {
   getDishes(searchQuery: $searchQuery) {
+    _id
     restaurantMobileNumber
     dishName
     mainIngredients
@@ -74,8 +75,40 @@ const GET_ORDERS = `query getOrders{
     status
   }
 }`;
+
+const GET_RESTAURANT = `query getRestaurant{
+  getRestaurant {
+    mobileNumber
+    name
+    address
+    city
+    provience
+    pincode
+    images
+    description
+    restaurantType 
+  }
+}`;
+
+const GET_CUSTOMER = `query getCustomer{
+  getCustomer {
+    fullName
+    dateOfBirth
+    email
+    mobileNumber
+    password
+    favorites
+    profilePicture
+    language
+    restFlg
+    address
+  }
+}`;
+
 export {
     GET_DISHES,
     GET_CART,
-    GET_ORDERS
+    GET_ORDERS,
+    GET_RESTAURANT,
+    GET_CUSTOMER
 }

@@ -1,18 +1,29 @@
-const   ADD_USER = `mutation register {
-    register {
+const   ADD_USER = `mutation register(
+    $fullName: String,
+    $mobileNumber: String,
+    $userType:  String,
+    $password: String,
+    $dateOfBirth: String,
+    $email: String,
+    $uploadedFile: String,
+    $address: String,
+    $city: String,
+    $country: String
+    ) {
+    register( 
+        fullName: $fullName,
+        mobileNumber: $mobileNumber,
+        userType: $userType,
+        password: $password,
+        dateOfBirth: $dateOfBirth,
+        email: $email,
+        uploadedFile: $uploadedFile,
+        address: $address,
+        city: $city,
+        country: $country
+        ) {
         fullName
-        mobileNumber
-        userType
-        password
-        dateOfBirth: "01-01-1995",
-        email: "abc@xyz",
-        uploadedFile: "",
-        address: "",
-        city:"",
-        country: "" 
-        },
-        fullName,
-        email,
+        email
       }
   }`
 

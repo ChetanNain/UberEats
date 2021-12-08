@@ -37,6 +37,7 @@ const Restaurant = new GraphQLObjectType({
 const Dish = new GraphQLObjectType({
     name: 'Dish',
     fields:()=>({
+        _id:  {type: GraphQLString},
         dishId: {type: GraphQLString},
         restaurantMobileNumber: {type: GraphQLString},
         dishName: {type: GraphQLString},

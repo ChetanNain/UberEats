@@ -18,6 +18,14 @@ const query = new GraphQLObjectType({
             }
 
         },
+        // getRestaurant : {
+        //     type: Restautant,
+        //     args: {},
+        //     resolve: async (parent, args, context)=> {
+        //         const response = await UserController.getRestaurant(context);
+        //         return response;
+        //     }
+        // },
         getDishes: {
             type: new GraphQLList(Dish),
             args: {

@@ -18,7 +18,7 @@ export default function Checkout(props) {
       },
     };
     axios
-      .get(`http://${window.location.hostname}:3001/cart`, headerConfig)
+      .get(`http://${window.location.hostname}:4000/cart`, headerConfig)
       .then((res) => {
         const data = res.data.filter((e) => e.checkedOut === 0);
         setCartData(data);
@@ -34,7 +34,7 @@ export default function Checkout(props) {
 
     axios
       .post(
-        `http://${window.location.hostname}:3001/checkout`,
+        `http://${window.location.hostname}:4000/checkout`,
         { specialInstruction: specialInstruction },
         headerConfig
       )

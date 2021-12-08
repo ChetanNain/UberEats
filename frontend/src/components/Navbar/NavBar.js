@@ -52,7 +52,7 @@ export default function NavBar(props) {
   const [cartData, setCartData] = useState([]);
 
   useEffect(() => {
-    axios.get(`http://${window.location.hostname}:3001/cart`).then((res) => {
+    axios.get(`http://${window.location.hostname}:4000/cart`).then((res) => {
       console.log("hello", res);
       setCartData(res.data);
     });
@@ -67,7 +67,7 @@ export default function NavBar(props) {
   }
   //   var addToCart =()=>{
   //     const data = {itemId: props.item.id, customerId: 1}
-  //     axios.post(`http://${window.location.hostname}:3001/addToCart', data)
+  //     axios.post(`http://${window.location.hostname}:4000/addToCart', data)
   //     .then(
   //         res => {
   //             alert("Item added to cart.");
@@ -76,7 +76,7 @@ export default function NavBar(props) {
   // }
   function removeItem(id) {
     const data = { itemId: id };
-    axios.post(`http://${window.location.hostname}:3001/removeFromCart`, data).then((res) => {
+    axios.post(`http://${window.location.hostname}:4000/removeFromCart`, data).then((res) => {
       //setCartData(res.data);
       let arr = [...cartData];
       const index = arr.findIndex((ele) => {

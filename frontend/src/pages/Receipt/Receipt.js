@@ -18,7 +18,7 @@
 //                 'x-authentication-header': localStorage.getItem('token')
 //                 }
 //             }
-//         axios.get(`http://${window.location.hostname}:3001/cart`, headerConfig).then((res) => {
+//         axios.get(`http://${window.location.hostname}:4000/cart`, headerConfig).then((res) => {
 //         const data = res.data.filter(e=> e.checkedOut === 0);
 //         setCartData(data);
 //     });
@@ -30,7 +30,7 @@
 //                 'x-authentication-header': localStorage.getItem('token')
 //               }
 //           }
-//           axios.post(`http://${window.location.hostname}:3001/checkout`, {specialInstruction: specialInstruction}, headerConfig ).then(res=>{
+//           axios.post(`http://${window.location.hostname}:4000/checkout`, {specialInstruction: specialInstruction}, headerConfig ).then(res=>{
 //             setOpen(true);
 //             setTimeout(()=>{
 //                 setOpen(false);

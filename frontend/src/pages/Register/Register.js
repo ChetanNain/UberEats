@@ -6,6 +6,7 @@ import {stateChangeHandler} from "../../redux/reducers/signUp";
 import Restaurant from "@mui/icons-material/Restaurant";
 import Card from "../../components/Card/Card";
 import PopUp from "../../components/Popup/Popup";
+import { ADD_USER } from "../../graphQL/mutation";
 
 export default function Register(props) {
   const dispatch = useDispatch();
@@ -34,7 +35,7 @@ export default function Register(props) {
         }
     }
       loadBasicDetails();
-    axios.get(`http://${window.location.hostname}:3001/cart`, headerConfig).then((res) => {
+    axios.get(`http://${window.location.hostname}:4000/cart`, headerConfig).then((res) => {
       setCartData(res.data);
     });
   }, []);
@@ -45,7 +46,7 @@ export default function Register(props) {
           'x-authentication-header': localStorage.getItem('token')
         }
     }
-    axios.get(`http://${window.location.hostname}:3001/customerBasicDetail`, headerConfig).then((res) => {
+    axios.get(`http://${window.location.hostname}:4000/customerBasicDetail`, headerConfig).then((res) => {
       if (res.data) {
         console.log("Response Data", res.data);
         dispatch(stateChangeHandler({ name: "fullName", value: res.data.fullName }));
@@ -59,7 +60,7 @@ export default function Register(props) {
         dispatch(stateChangeHandler({ name: "password", value: res.data.password }));
         dispatch(stateChangeHandler({ name: "userType", value: res.data.userType }));
         dispatch(stateChangeHandler({ name: "city", value: res.data.address[0].city }));
-        setProfilePic(`http://${window.location.hostname}:3001${res.data.profilePicture}`);
+        setProfilePic(`http://${window.location.hostname}:4000/resources/${res.data.profilePicture}`);
       }
     });
   }
@@ -146,7 +147,7 @@ export default function Register(props) {
     if (!valdiate()) return;
     const basicDetails = { ...registrationData, uploadedFile };
     axios
-      .post(`http://${window.location.hostname}:3001/addCustomerDetail`, basicDetails)
+      .post(`http://${window.location.hostname}:4000/graphql`, {query: ADD_USER, variables: basicDetails})
       .then((res) => {
         if(!localStorage.getItem('role')){
           localStorage.setItem('token', res.data.token);
@@ -169,7 +170,7 @@ export default function Register(props) {
   };
   const formData = new FormData();
   formData.append('myImage', e.target.files[0]);
-      axios.post(`http://${window.location.hostname}:3001/upload`,formData,config)
+      axios.post(`http://${window.location.hostname}:4000/upload`,formData,config)
           .then((res) => {
            setUploadedFile(res.data.fileName);
           }).catch((error) => {

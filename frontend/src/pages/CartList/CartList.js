@@ -3,7 +3,7 @@ import React from 'react';
 import './CartList.css';
 
 export default function CartList(props) {
-    const imageURL = `http://${window.location.hostname}:3001${props.cartItem.dishId.dishImage}`;
+    const imageURL = `http://${window.location.hostname}:4000/resources/${props.cartItem.dishId.dishImage}`;
 
     return (
         <div className ="small-container cart-page cardBody">

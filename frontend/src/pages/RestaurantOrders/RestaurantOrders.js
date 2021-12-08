@@ -11,7 +11,7 @@ export default function RestaurantOrders() {
     };
     console.log("data", data);
     await axios.post(
-      `http://${window.location.hostname}:3001/updateOrderStatus`,
+      `http://${window.location.hostname}:4000/updateOrderStatus`,
       data
     );
     alert("Status Updated");
@@ -34,19 +34,6 @@ export default function RestaurantOrders() {
     loadOrder();
   }, [refresh]);
 
-  // function loadOrder() {
-  //   const headerConfig = {
-  //     headers: {
-  //       "x-authentication-header": localStorage.getItem("token"),
-  //     },
-  //   };
-  //   axios
-  //     .get(`http://${window.location.hostname}:3001/orders`, headerConfig)
-  //     .then((res) => {
-  //       setOrders(res.data);
-  //     });
-  // }
-
 
   function loadOrder(){
     axios.post(`http://${window.location.hostname}:4000/graphql`, {
@@ -58,7 +45,7 @@ export default function RestaurantOrders() {
 
   async function cancelOrder(id) {
     await axios.post(
-      `http://${window.location.hostname}:3001/updateOrderStatus`,
+      `http://${window.location.hostname}:4000/updateOrderStatus`,
       { orderStatus: 4, orderId: id }
     );
     loadOrder();

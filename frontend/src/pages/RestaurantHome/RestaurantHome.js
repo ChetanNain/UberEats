@@ -33,17 +33,17 @@ export default function RestaurantHome(props) {
         }
     }
     if(!resId){
-      axios.get(`http://${window.location.hostname}:3001/restaurantDishes`, headerConfig).then(res => {
+      axios.get(`http://${window.location.hostname}:4000/restaurantDishes`, headerConfig).then(res => {
             if(res.data){
               setData(res.data)
             }
       })
-      axios.get(`http://${window.location.hostname}:3001/restaurants`, headerConfig).then(res => { 
+      axios.get(`http://${window.location.hostname}:4000/restaurants`, headerConfig).then(res => { 
         if(res.data && res.data.length > 0){
           setRestaurant(res.data[0])
         }
       })
-      axios.get(`http://${window.location.hostname}:3001/basicDetail`, headerConfig).then(res=>{
+      axios.get(`http://${window.location.hostname}:4000/basicDetail`, headerConfig).then(res=>{
         if(res.data){
           setRestaurantName(res.data.name);
           setRestaurantLocation(res.data.address);
@@ -56,13 +56,13 @@ export default function RestaurantHome(props) {
         }
       })
   }else{
-    axios.get(`http://${window.location.hostname}:3001/restaurantDishes?restaurandId=`+ resId, headerConfig).then(res => {
+    axios.get(`http://${window.location.hostname}:4000/restaurantDishes?restaurandId=`+ resId, headerConfig).then(res => {
       setData(res.data);
     })
-    axios.get(`http://${window.location.hostname}:3001/restaurants?restaurandId=`+ resId, headerConfig).then(res => { 
+    axios.get(`http://${window.location.hostname}:4000/restaurants?restaurandId=`+ resId, headerConfig).then(res => { 
     setRestaurant(res.data[0]);
     })
-    axios.get(`http://${window.location.hostname}:3001/basicDetail?restaurandId=`+ resId, headerConfig).then(res=>{
+    axios.get(`http://${window.location.hostname}:4000/basicDetail?restaurandId=`+ resId, headerConfig).then(res=>{
             setRestaurantName(res.data.name);
             setRestaurantLocation(res.data.address);
             setRestaurantCity(res.data.city);
@@ -79,8 +79,8 @@ return(
     <div>
     <Carousel style={{height: '300px'}}>
       {data.map(carousal=>{
-          const dishImage = `http://${window.location.hostname}:3001${carousal.dishImage}`;
-          //const dishImage = `http://${window.location.hostname}:3001/resources/${carousal.dishImage}`;
+          const dishImage = `http://${window.location.hostname}:4000/resources/${carousal.dishImage}`;
+          //const dishImage = `http://${window.location.hostname}:4000/resources/${carousal.dishImage}`;
             return <Carousel.Item style={{height: '300px'}}>
             <img
               className="d-block w-100"

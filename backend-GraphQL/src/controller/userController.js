@@ -142,9 +142,9 @@ async function getCart(context) {
 async function getOrders(context){
     const tokenHeader = context.headers[AUTHENTICATION_HEADER];
     var decoded = jwt.verify(tokenHeader, SECRET_KEY);
-    console.log("decoded",decoded.data.mobileNumber)
-    let response= await Cart.find({customerMobileNumber: decoded.data.mobileNumber , checkedOut: 1})
-    if(decoded.data.role===0){
+    let response = [];
+    console.log("data", decoded.data);
+    if(decoded.data.role == 0){
         response = await Cart.find({customerMobileNumber: decoded.data.mobileNumber , checkedOut: 1})//.populate("dishId").exec();
     }else{
         response = await Cart.find({restaurantMobileNumber: decoded.data.mobileNumber , checkedOut: 1})//.populate("dishId").exec();
@@ -159,7 +159,9 @@ async function getOrders(context){
     res.status(200).json(response);
   }
 
-  async function login(mobileNumber, password){
+  async function login(req, res){
+     const mobileNumber = req.body.mobileNumber
+      const password = req.body.password
     const results = await Customers.find({email: mobileNumber});
         if(results.length > 0){
             bcrypt.compare(password, results[0].password, function(err, result){
@@ -172,7 +174,7 @@ async function getOrders(context){
                             role: results[0].restFlg,
                         }
                       }, SECRET_KEY, { expiresIn: '12h' });
-                     return {
+                     res.send({
                         token: token,
                         msg: 'LoggedIn successfully',
                         data: {
@@ -181,11 +183,11 @@ async function getOrders(context){
                          mobileNumber: results[0].mobileNumber,
                          role: results[0].restFlg
                         }
-                    }
+                    })
                   }
                 })
               }else{
-                return "Invalid user name or password";
+                res.send("Invalid user name or password");
               }
   }
 
